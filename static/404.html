@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Kutter - 404</title>
+        <link rel="icon" href="imgs/kutter.png" />
+        <link rel="stylesheet" href="styles/build.css" />
+        <link
+            href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <section>
+            <div class="e404">
+                <div>
+                    <h1>Error 404</h1>
+                    <hr />
+                    <p>The page you are looking for does not exist.</p>
+                    <p>Please check the URL or try again later.</p>
+                    <hr />
+                    <a href="/"><button>Go Back</button></a>
+                </div>
+            </div>
+        </section>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const theme = localStorage.getItem("theme");
+                if (theme == "dark") {
+                    document.documentElement.classList.add("dark");
+                    themeIcon.classList.add("bx-moon");
+                    themeIcon.classList.remove("bx-sun");
+                } else if (theme == "light") {
+                    document.documentElement.classList.remove("dark");
+                    themeIcon.classList.add("bx-sun");
+                    themeIcon.classList.remove("bx-moon");
+                }
+            });
+        </script>
+    </body>
+</html>

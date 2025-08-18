@@ -1,0 +1,25 @@
+:root {
+    --bg: #ffffff;
+    --text: #000000;
+    --border: #e0e0e0;
+    --accent:rgb(183, 159, 214);
+    --hover: #f0f0f0;
+    --hover-accent: #e6e6fa;
+    --error: #a80000;
+    --error-bg: #e7bebe;
+    --success: #007a00;
+    --success-bg: #b2e7b2;
+}
+
+.dark {
+    --bg: #121212;
+    --text: #ffffff;
+    --border: #2a2a2a;
+    --accent: #9f7ae6;
+    --hover: #333333;
+    --hover-accent: #8164b6;
+    --error: #c46c6c;
+    --error-bg: #472222;
+    --success: #84c284;
+    --success-bg: #1a3d1a;
+}

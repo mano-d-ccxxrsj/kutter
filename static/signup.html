@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Kutter - Sign up</title>
+        <link rel="icon" href="imgs/kutter.png" />
+        <link rel="stylesheet" href="styles/build.css" />
+        <link
+            href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <nav>
+            <div class="logo">
+                <h1>Kutter</h1>
+            </div>
+            <div class="nav-buttons">
+                <button id="theme-button" class="theme-button">Theme</button>
+            </div>
+        </nav>
+        <section>
+            <form class="form">
+                <div class="form-inputs">
+                    <h1>Sign up to Kutter</h1>
+                    <input
+                        id="usernameInput"
+                        type="username"
+                        placeholder="Username"
+                        required
+                    />
+                    <input
+                        id="emailInput"
+                        type="email"
+                        placeholder="Email"
+                        required
+                    />
+                    <input
+                        id="passwordInput"
+                        type="password"
+                        placeholder="Password"
+                        required
+                    />
+                    <input
+                        id="confirmPasswordInput"
+                        type="password"
+                        placeholder="Confirm Password"
+                        required
+                    />
+                </div>
+                <div class="form-buttons">
+                    <button id="signButton" class="sign-button" type="submit">
+                        Sign up
+                    </button>
+                    <a href="/"><button type="button">Go back</button></a>
+                </div>
+            </form>
+        </section>
+        <script type="module" src="js/index.js"></script>
+        <script type="module" src="js/signup.js"></script>
+    </body>
+</html>
