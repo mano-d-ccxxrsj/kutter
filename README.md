@@ -2,7 +2,7 @@
 
 ## Real time chatting web application
 
-![Kutter](https://github.com/Ryterm/kutter/blob/main/static/imgs/kutter.png)
+![Kutter](https://github.com/Icarox52/kutter/blob/main/static/imgs/Banner-Kutter.png)
 
 Kutter is a real time chatting web application with a focus on speed and simplicity without that polluted design.
 
