@@ -559,6 +559,8 @@ pub async fn ws_handler(
                     Ok(_) => {}
                     Err(e) => {
                         eprintln!("Error sending WS broadcast: {}", e);
+                        let mut sessions = broadcast_user_sessions.write().await;
+                        sessions.remove(&broadcast_email);
                     }
                 }
             }

@@ -113,7 +113,7 @@ struct VerificationData {
     code: String,
 }
 
-#[post("/register")]
+#[post("/register")] // it has to be get and not post
 pub async fn register(
     pool: web::Data<PgPool>,
     req: web::Json<RegisterForm>,
