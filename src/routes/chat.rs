@@ -9,7 +9,10 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::{RwLock, broadcast};
+use tokio::{
+    select,
+    sync::{RwLock, broadcast},
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct ChatMessage {
@@ -524,67 +527,90 @@ pub async fn ws_handler(
     });
 
     actix_rt::spawn(async move {
-        while let Ok(msg) = rx.recv().await {
-            let session_exists = {
-                let sessions = broadcast_user_sessions.read().await;
-                sessions.contains_key(&broadcast_email)
-            };
+        let mut session_alive = true;
 
-            if !session_exists {
-                println!("Session doesnt exists");
-                break;
-            }
+        while session_alive {
+            select! {
+                msg = rx.recv() => {
+                    match msg {
+                        Ok(msg) => {
+                            let session_still_alive = {
+                                let sessions = broadcast_user_sessions.read().await;
+                                sessions.contains_key(&broadcast_email)
+                            };
 
-            let current_user_chats = {
-                let sessions = broadcast_user_sessions.read().await;
-                if let Some(user_session) = sessions.get(&broadcast_email) {
-                    user_session.user_chats.clone()
-                } else {
-                    continue;
-                }
-            };
+                            if !session_still_alive {
+                                session_alive = false;
+                                continue;
+                            }
 
-            let should_send = match &msg {
-                OutgoingMessage::NewMessage(chat_msg) => {
-                    if let Some(chat_id) = chat_msg.chat_id {
-                        if current_user_chats.contains(&chat_id) {
-                            true
-                        } else {
-                            match sqlx::query_scalar::<_, bool>(
-                                "SELECT EXISTS(SELECT * FROM chats WHERE id = $1 AND (first_user_name = $2 OR second_user_name = $2))"
-                            )
-                            .bind(chat_id)
-                            .bind(&broadcast_email)
-                            .fetch_one(&second_db_pool)
-                            .await {
-                                Ok(exists) => exists,
-                                Err(_) => false
+                            let current_user_chats = {
+                                let sessions = broadcast_user_sessions.read().await;
+                                if let Some(user_session) = sessions.get(&broadcast_email) {
+                                    user_session.user_chats.clone()
+                                } else {
+                                    continue;
+                                }
+                            };
+
+                            let should_send = match &msg {
+                                OutgoingMessage::NewMessage(chat_msg) => {
+                                    if let Some(chat_id) = chat_msg.chat_id {
+                                        if current_user_chats.contains(&chat_id) {
+                                            true
+                                        } else {
+                                            match sqlx::query_scalar::<_, bool>(
+                                                "SELECT EXISTS(SELECT * FROM chats WHERE id = $1 AND (first_user_name = $2 OR second_user_name = $2))"
+                                            )
+                                            .bind(chat_id)
+                                            .bind(&broadcast_email)
+                                            .fetch_one(&second_db_pool)
+                                            .await {
+                                                Ok(exists) => exists,
+                                                Err(_) => false
+                                            }
+                                        }
+                                    } else {
+                                        false
+                                    }
+                                }
+                                OutgoingMessage::Delete { message_id: _ } => true,
+                                OutgoingMessage::NewChat(chat) => {
+                                    chat.first_user_name == broadcast_email
+                                        || chat.second_user_name == broadcast_email
+                                }
+                            };
+
+                            if should_send {
+                                if let Err(_) = broadcast_session
+                                    .text(serde_json::to_string(&msg).unwrap())
+                                    .await
+                                {
+                                    session_alive = false;
+                                }
                             }
                         }
-                    } else {
-                        false
+                        Err(_) => {
+                            session_alive = false;
+                        }
                     }
                 }
-                OutgoingMessage::Delete { message_id: _ } => true,
-                OutgoingMessage::NewChat(chat) => {
-                    chat.first_user_name == broadcast_email
-                        || chat.second_user_name == broadcast_email
-                }
-            };
 
-            if should_send {
-                match broadcast_session
-                    .text(serde_json::to_string(&msg).unwrap())
-                    .await
-                {
-                    Ok(_) => {}
-                    Err(e) => {
-                        eprintln!("Error sendind message\nReason: {}", e);
-                        break;
+                _ = async {
+                    let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
+                    loop {
+                        interval.tick().await;
+                        let sessions = broadcast_user_sessions.read().await;
+                        if !sessions.contains_key(&broadcast_email) {
+                            break;
+                        }
                     }
+                } => {
+                    session_alive = false;
                 }
             }
         }
+        println!("Broadcast task ended for {}", broadcast_email);
     });
 
     Ok(response)
