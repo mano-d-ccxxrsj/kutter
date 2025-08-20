@@ -1,3 +1,5 @@
+// we need fix the session management, is crashing everytime <--- ig its now fixed
+
 use crate::middlewares::verify_token;
 use actix_web::{Error, HttpRequest, HttpResponse, get, web};
 use actix_ws::Message;
@@ -191,6 +193,7 @@ pub async fn ws_handler(
     let tx = state.tx.clone();
     let mut rx = tx.subscribe();
     let user_sessions = state.user_sessions.clone();
+    let broadcast_user_sessions = user_sessions.clone();
 
     {
         let mut sessions = user_sessions.write().await;
@@ -209,7 +212,6 @@ pub async fn ws_handler(
     let mut _message_session = session;
 
     let broadcast_email = email.clone();
-    let broadcast_user_sessions = user_sessions.clone();
 
     actix_rt::spawn(async move {
         while let Some(Ok(msg)) = msg_stream.next().await {
@@ -507,6 +509,15 @@ pub async fn ws_handler(
                         }
                     }
                 }
+                Message::Close(_) => {
+                    println!("(chat.rs) Session closed");
+                    {
+                        let mut sessions_write = user_sessions.write().await;
+                        sessions_write.remove(&email);
+                    }
+                    println!("session removed. email: {}", email);
+                    break;
+                }
                 _ => {}
             }
         }
@@ -514,6 +525,16 @@ pub async fn ws_handler(
 
     actix_rt::spawn(async move {
         while let Ok(msg) = rx.recv().await {
+            let session_exists = {
+                let sessions = broadcast_user_sessions.read().await;
+                sessions.contains_key(&broadcast_email)
+            };
+
+            if !session_exists {
+                println!("Session doesnt exists");
+                break;
+            }
+
             let current_user_chats = {
                 let sessions = broadcast_user_sessions.read().await;
                 if let Some(user_session) = sessions.get(&broadcast_email) {
@@ -558,16 +579,12 @@ pub async fn ws_handler(
                 {
                     Ok(_) => {}
                     Err(e) => {
-                        eprintln!("Error sending WS broadcast: {}", e);
-                        let mut sessions = broadcast_user_sessions.write().await;
-                        sessions.remove(&broadcast_email);
+                        eprintln!("Error sendind message\nReason: {}", e);
+                        break;
                     }
                 }
             }
         }
-
-        let mut sessions = broadcast_user_sessions.write().await;
-        sessions.remove(&broadcast_email);
     });
 
     Ok(response)

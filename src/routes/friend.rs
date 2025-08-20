@@ -341,8 +341,13 @@ pub async fn ws_handler(
                         eprintln!("Failed to parse WebSocket message: {}", text);
                     }
                 }
-                Message::Close(reason) => {
-                    println!("WebSocket connection closed: {:?}", reason);
+                Message::Close(_) => {
+                    println!("(friend.rs): Session closed");
+                    {
+                        let mut sessions = user_sessions.write().await;
+                        sessions.remove(&email);
+                    }
+                    println!("session removed. email: {}", email);
                     break;
                 }
                 Message::Ping(data) => {

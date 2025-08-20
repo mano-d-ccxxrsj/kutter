@@ -514,7 +514,7 @@ const Chat = {
       APP_STATE.sockets.chat.onerror = (error) => {
         console.error("WebSocket error:", error);
         createErrorAlert("Connection error. Reconnecting...");
-        Chat.setupWebSocket();
+        setTimeout(() => Chat.setupWebSocket(), 3000);
       };
     });
   },
