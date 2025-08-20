@@ -487,6 +487,8 @@ const Chat = {
                 );
                 APP_STATE.renderedMessages.add(messageId);
               }
+            } else {
+              createSuccessAlert(`New message from: @${data.username}`);
             }
           } else if (data.action === "delete") {
             const message_to_delete = document.getElementById(
