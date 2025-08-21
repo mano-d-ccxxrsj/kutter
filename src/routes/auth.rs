@@ -52,7 +52,7 @@ pub fn send_email(email: String, username: String, url: String) -> Result<(), St
         .subject("Verify your account!")
         .header(ContentType::TEXT_HTML)
         .body(format!(
-            "Hey {}, <a href=\"https://kutter.ryterm.xyz/verify_email?token={}\">click here to verify your email!!\n\nCopy and paste this in the app to verify your account :3",
+            "Hey {}, <a href=\"https://kutter.ryterm.xyz/verify_email?token={}\">click here</a> to verify your email :3",
             username, url
         ))
         .map_err(|e| format!("Failed to build email: {}", e))?;
@@ -245,14 +245,32 @@ pub async fn login(pool: web::Data<PgPool>, req: web::Json<LoginForm>) -> impl R
         true => {
             let token = generate_token(user.email.clone(), user.username.clone());
             let cookie = create_cookie(token);
-            HttpResponse::Ok().cookie(cookie).json(json!({
-                "status": "success",
-                "message": "user logged in",
-                "user": {
-                    "username": user.username,
-                    "email": user.email
-                }
-            }))
+            let is_verified = match sqlx::query_as::<_, User>(
+                "SELECT * FROM users WHERE email = $1 AND verified = true",
+            )
+            .bind(&email)
+            .fetch_one(pool.as_ref())
+            .await
+            {
+                Ok(_) => true,
+                Err(_) => false,
+            };
+
+            if is_verified {
+                return HttpResponse::Ok().cookie(cookie).json(json!({
+                    "status": "success",
+                    "message": "user logged in",
+                    "user": {
+                        "username": user.username,
+                        "email": user.email
+                    }
+                }));
+            } else {
+                return HttpResponse::Unauthorized().json(json!({
+                    "status": "error",
+                    "message": "email not verified",
+                }));
+            }
         }
         false => {
             return HttpResponse::Unauthorized().json(json!({

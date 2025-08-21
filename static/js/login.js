@@ -3,6 +3,7 @@ import { createErrorAlert, createSuccessAlert } from "./index.js";
 const emailInput = document.getElementById("emailInput");
 const passwordInput = document.getElementById("passwordInput");
 const loginButton = document.getElementById("signButton");
+const modalBase = document.getElementById("modalBase");
 
 loginButton.addEventListener("click", async (e) => {
   e.preventDefault();
@@ -24,6 +25,11 @@ loginButton.addEventListener("click", async (e) => {
     setInterval(() => {
       window.location.href = "/me.html";
     }, 1000);
+  } else if (data.message === "email not verified") {
+    modalBase.style.display = "flex";
+    modalBase.addEventListener("click", () => {
+      modalBase.style.display = "none";
+    });
   } else {
     createErrorAlert(data.message);
   }
