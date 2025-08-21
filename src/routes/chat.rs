@@ -610,7 +610,6 @@ pub async fn ws_handler(
                 }
             }
         }
-        println!("Broadcast task ended for {}", broadcast_email);
     });
 
     Ok(response)

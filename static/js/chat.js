@@ -432,6 +432,7 @@ const Chat = {
           close_button.remove();
           APP_STATE.currentReply = null;
           DOM_ELEMENTS.repliedMessageContainer.style.display = "none";
+          DOM_ELEMENTS.chatContainer.style.marginBottom = "84px";
         }
       } catch (e) {
         createErrorAlert("Failed to send message");
@@ -532,14 +533,10 @@ const Chat = {
 
     const data = await response.json();
 
-    const sortedChats = data.sort((a, b) => {
-      const dateA = new Date(a.last_update);
-      const dateB = new Date(b.last_update);
-      return dateB - dateA;
-    });
+    // TODO: sort chats by last_update
 
     await Promise.all(
-      sortedChats.map(async (chat) => {
+      data.map(async (chat) => {
         const chatId = `c${chat.id}`;
         const otherUser =
           APP_STATE.currentUser.username === chat.first_user_name
@@ -603,6 +600,7 @@ const Chat = {
       close_button.remove();
       APP_STATE.currentReply = null;
       DOM_ELEMENTS.repliedMessageContainer.style.display = "none";
+      DOM_ELEMENTS.chatContainer.style.marginBottom = "84px";
     }
 
     DOM_ELEMENTS.topbar.style.display = "flex";

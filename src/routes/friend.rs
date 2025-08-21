@@ -350,13 +350,6 @@ pub async fn ws_handler(
                     println!("session removed.");
                     break;
                 }
-                Message::Ping(data) => {
-                    println!("Received ping, sending pong");
-                    let _ = message_session.pong(&data).await;
-                }
-                Message::Pong(_) => {
-                    println!("Received pong");
-                }
                 _ => {
                     println!("Received other message type: {:?}", msg);
                 }
