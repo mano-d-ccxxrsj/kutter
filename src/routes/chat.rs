@@ -518,7 +518,7 @@ pub async fn ws_handler(
                         let mut sessions_write = user_sessions.write().await;
                         sessions_write.remove(&email);
                     }
-                    println!("session removed. email: {}", email);
+                    println!("session removed.");
                     break;
                 }
                 _ => {}

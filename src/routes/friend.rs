@@ -347,7 +347,7 @@ pub async fn ws_handler(
                         let mut sessions = user_sessions.write().await;
                         sessions.remove(&email);
                     }
-                    println!("session removed. email: {}", email);
+                    println!("session removed.");
                     break;
                 }
                 Message::Ping(data) => {
