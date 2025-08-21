@@ -1,5 +1,7 @@
 use crate::RegexValidator;
-use crate::middlewares::{generate_token, verify_token};
+use crate::middlewares::{
+    generate_token, generate_verify_email_token, verify_email_confirmation_token, verify_token,
+};
 use actix_multipart::Multipart;
 use actix_web::{
     HttpRequest, HttpResponse, Responder,
@@ -12,7 +14,6 @@ use lettre::message::Mailbox;
 use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
-use rand::random_range;
 use sanitize_filename::sanitize;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -35,18 +36,7 @@ fn verify_cookie(req: HttpRequest) -> Option<String> {
     req.cookie("token").map(|c| c.value().to_string())
 }
 
-const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-pub fn generate_verification_code() -> String {
-    (0..6)
-        .map(|_| {
-            let idx = random_range(0..CHARSET.len());
-            CHARSET[idx] as char
-        })
-        .collect()
-}
-
-pub fn send_email(email: String, username: String, code: String) -> Result<(), String> {
+pub fn send_email(email: String, username: String, url: String) -> Result<(), String> {
     let from_address = env::var("SMTP_USER")
         .map_err(|e| format!("Failed to load SMTP_USER: {}", e))?
         .parse()
@@ -60,10 +50,10 @@ pub fn send_email(email: String, username: String, code: String) -> Result<(), S
         .from(Mailbox::new(Some("Kutter".to_owned()), from_address))
         .to(Mailbox::new(Some(username.clone()), to_address))
         .subject("Verify your account!")
-        .header(ContentType::TEXT_PLAIN)
+        .header(ContentType::TEXT_HTML)
         .body(format!(
-            "Hey {}, here's your verification code: {}\n\nCopy and paste this in the app to verify your account :3",
-            username, code
+            "Hey {}, <a href=\"https://kutter.ryterm.xyz/verify_email?token={}\">click here to verify your email!!\n\nCopy and paste this in the app to verify your account :3",
+            username, url
         ))
         .map_err(|e| format!("Failed to build email: {}", e))?;
 
@@ -90,7 +80,6 @@ struct User {
     email: String,
     password: String,
     verified: bool,
-    verification_code: Option<String>,
     profile_picture: Option<String>,
 }
 
@@ -109,11 +98,10 @@ struct LoginForm {
 
 #[derive(Deserialize)]
 struct VerificationData {
-    email: String,
-    code: String,
+    token: String,
 }
 
-#[post("/register")] // it has to be get and not post
+#[post("/register")]
 pub async fn register(
     pool: web::Data<PgPool>,
     req: web::Json<RegisterForm>,
@@ -161,7 +149,7 @@ pub async fn register(
         }
     };
 
-    let code = generate_verification_code();
+    let url = generate_verify_email_token(username.clone(), email.clone());
 
     let email_exists = match sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
         .bind(&email)
@@ -185,18 +173,17 @@ pub async fn register(
     }
 
     let insert_result = sqlx::query_as::<_, User>(
-        "INSERT INTO users (username, email, password, verification_code) VALUES ($1, $2, $3, $4) RETURNING *",
+        "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *",
     )
     .bind(&username)
     .bind(&email)
     .bind(password_hash)
-    .bind(&code)
     .fetch_one(pool.get_ref())
     .await;
 
     match insert_result {
         Ok(user) => {
-            if let Err(e) = send_email(email, username, code) {
+            if let Err(e) = send_email(email, username, url) {
                 return HttpResponse::InternalServerError().json(json!({
                     "status": "error",
                     "message": format!("failed to send verification email: {}", e),
@@ -208,9 +195,9 @@ pub async fn register(
                 "user": user.username
             }))
         }
-        Err(_) => HttpResponse::InternalServerError().json(json!({
+        Err(e) => HttpResponse::InternalServerError().json(json!({
             "status": "error",
-            "message": "failed to create user",
+            "message": format!("failed to create user: {}; {:?}", e, e),
         })),
     }
 }
@@ -406,7 +393,7 @@ pub async fn verify_user(req: HttpRequest, pool: web::Data<PgPool>) -> impl Resp
         }
     };
 
-    match sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
+    match sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1 AND verified = true")
         .bind(&claims.sub)
         .fetch_optional(pool.get_ref())
         .await
@@ -420,63 +407,65 @@ pub async fn verify_user(req: HttpRequest, pool: web::Data<PgPool>) -> impl Resp
                 "pfp_path": user.profile_picture
             }
         })),
-        _ => HttpResponse::Ok().json(json!({
-            "status": "error",
-            "message": "user not found"
-        })),
+        _ => {
+            let url = generate_verify_email_token(claims.email.clone(), claims.sub.clone());
+            let _ = send_email(claims.sub, claims.email, url);
+            HttpResponse::BadRequest().json(json!({
+                "status": "error",
+                "message": "User doesn't exist or not verified."
+            }))
+        }
     }
 }
 
-#[post("/verify_email")]
+#[get("/verify_email")]
 pub async fn verify_email(
     pool: web::Data<PgPool>,
-    req: web::Json<VerificationData>,
+    query: web::Query<VerificationData>,
 ) -> impl Responder {
-    let email = req.email.clone();
-    let code = req.code.clone();
+    let token = query.token.clone();
 
-    let user = match sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
-        .bind(&email)
-        .fetch_optional(pool.get_ref())
-        .await
-    {
-        Ok(Some(user)) => user,
-        _ => {
-            return HttpResponse::BadRequest().json(json!({
+    let verified_user = match verify_email_confirmation_token(token) {
+        Ok(verified) => verified,
+        Err(_) => {
+            return HttpResponse::Ok().json(json!({
                 "status": "error",
-                "message": "user not found",
+                "message": "invalid token"
             }));
         }
     };
 
-    if user.verified {
-        return HttpResponse::Conflict().json(json!({
-            "status": "error",
-            "message": "user already verified"
-        }));
-    }
+    let user_exists =
+        match sqlx::query_scalar::<_, bool>("SELECT EXISTS(SELECT * FROM users WHERE email = $1)")
+            .bind(&verified_user.email)
+            .fetch_one(pool.get_ref())
+            .await
+        {
+            Ok(exists) => exists,
+            Err(_) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "error",
+                    "message": "failed to check user existence"
+                }));
+            }
+        };
 
-    if user.verification_code.as_deref() != Some(code.as_str()) {
-        return HttpResponse::Unauthorized().json(json!({
+    if !user_exists {
+        return HttpResponse::NotFound().json(json!({
             "status": "error",
-            "message": "invalid verification code"
+            "message": "user not found"
         }));
     }
 
     match sqlx::query("UPDATE users SET verified = true WHERE email = $1")
-        .bind(&email)
+        .bind(&verified_user.email)
         .execute(pool.get_ref())
         .await
     {
-        Ok(_) => {
-            let token = generate_token(user.email.clone(), user.username.clone());
-            let cookie = create_cookie(token);
-
-            HttpResponse::Ok().cookie(cookie).json(json!({
-                "status": "success",
-                "message": "user verified successfully"
-            }))
-        }
+        Ok(_) => HttpResponse::Ok().json(json!({
+            "status": "success",
+            "message": "user verified successfully"
+        })),
         Err(_) => HttpResponse::InternalServerError().json(json!({
             "status": "error",
             "message": "failed to update user verification"

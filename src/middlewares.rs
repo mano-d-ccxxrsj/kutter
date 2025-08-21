@@ -18,7 +18,6 @@ pub struct EmailVerify {
     pub sub: String,
     pub exp: usize,
     pub email: String,
-    pub password: String,
 }
 
 pub async fn create_user_table(pool: &PgPool) -> Result<(), sqlx::Error> {
@@ -56,12 +55,49 @@ pub fn generate_token(username: String, email: String) -> String {
     token
 }
 
+pub fn generate_verify_email_token(username: String, email: String) -> String {
+    let expiration = OffsetDateTime::now_utc() + Duration::hours(1);
+    let key = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+
+    let email_verify = EmailVerify {
+        sub: username,
+        exp: expiration.unix_timestamp() as usize,
+        email: email,
+    };
+
+    let token = encode(
+        &Header::default(),
+        &email_verify,
+        &EncodingKey::from_secret(key.as_ref()),
+    )
+    .unwrap();
+    token
+}
+
 pub fn verify_token(token: String) -> Result<Claims, String> {
     let key = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
     let mut validation = Validation::default();
     validation.required_spec_claims.remove("verified");
 
     match decode::<Claims>(
+        &token,
+        &DecodingKey::from_secret(key.as_ref()),
+        &Validation::default(),
+    ) {
+        Ok(token_data) => Ok(token_data.claims),
+        Err(e) => {
+            eprintln!("Token verification error: {:?}", e);
+            Err("Invalid token".to_string())
+        }
+    }
+}
+
+pub fn verify_email_confirmation_token(token: String) -> Result<EmailVerify, String> {
+    let key = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let mut validation = Validation::default();
+    validation.required_spec_claims.remove("verified");
+
+    match decode::<EmailVerify>(
         &token,
         &DecodingKey::from_secret(key.as_ref()),
         &Validation::default(),
