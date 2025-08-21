@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 export function createErrorAlert(message) {
   const alertSpan = document.createElement("span");
+  alertSpan.id = "notification";
   const theme = localStorage.getItem("theme");
   const dark = {
     color: "#c46c6c",
@@ -42,6 +43,7 @@ export function createErrorAlert(message) {
     bottom: "10px",
     right: "10px",
     padding: "10px",
+    id: "notification",
     color: theme === "dark" ? dark.color : light.color,
     backgroundColor:
       theme === "dark" ? dark.backgroundColor : light.backgroundColor,
@@ -59,6 +61,7 @@ export function createErrorAlert(message) {
 
 export function createSuccessAlert(message) {
   const alertSpan = document.createElement("span");
+  alertSpan.id = "notification";
   const theme = localStorage.getItem("theme");
   const dark = {
     color: "#84c284",

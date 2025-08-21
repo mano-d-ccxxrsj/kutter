@@ -36,8 +36,8 @@ const APP_STATE = {
   currentUser: null,
   currentChatPartner: null,
   currentChatId: null,
+  hasToast: null,
   renderedChats: new Set(),
-  hammer: null,
   renderedMessages: new Set(),
   sockets: {
     friendReq: null,
@@ -46,6 +46,12 @@ const APP_STATE = {
 };
 
 const Utils = {
+  verifyToast: () => {
+    const notification = document.getElementById("notification");
+    if (notification) {
+      notification.remove();
+    }
+  },
   formatTimestamp: (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -84,6 +90,7 @@ const User = {
     const data = await response.json();
 
     if (data.status !== "success") {
+      Utils.verifyToast();
       createErrorAlert("You are not logged in");
       setTimeout(() => window.location.replace("/login.html"), 1000);
       return false;
@@ -301,6 +308,7 @@ const Friends = {
     try {
       APP_STATE.sockets.friendReq.send(JSON.stringify(wsMessage));
     } catch (e) {
+      Utils.verifyToast();
       createErrorAlert("Error sending friend request");
     }
   },
@@ -333,6 +341,7 @@ const Friends = {
       APP_STATE.sockets.friendReq.send(JSON.stringify(wsMessage));
       DOM_ELEMENTS.friendReqInput.value = "";
     } catch (e) {
+      Utils.verifyToast();
       createErrorAlert("Error sending friend request");
     }
   },
@@ -376,6 +385,7 @@ const Friends = {
           break;
 
         case "error":
+          Utils.verifyToast();
           createErrorAlert(data.payload.message);
           break;
       }
@@ -394,6 +404,7 @@ const Chat = {
       console.log(APP_STATE.currentChatId);
       console.log(APP_STATE.currentChatPartner);
       if (!APP_STATE.currentChatId) {
+        Utils.verifyToast();
         createErrorAlert("Chat not ready. Please wait...");
         return;
       }
@@ -402,6 +413,7 @@ const Chat = {
         !APP_STATE.sockets.chat ||
         APP_STATE.sockets.chat.readyState !== WebSocket.OPEN
       ) {
+        Utils.verifyToast();
         createErrorAlert("Connection not ready. Please wait...");
         return;
       }
@@ -435,6 +447,7 @@ const Chat = {
           DOM_ELEMENTS.chatContainer.style.marginBottom = "84px";
         }
       } catch (e) {
+        Utils.verifyToast();
         createErrorAlert("Failed to send message");
         console.error("Error sending message:", e);
       }
@@ -516,6 +529,7 @@ const Chat = {
 
       APP_STATE.sockets.chat.onerror = (error) => {
         console.error("WebSocket error:", error);
+        Utils.verifyToast();
         createErrorAlert("Connection error. Reconnecting...");
         setTimeout(() => Chat.setupWebSocket(), 3000);
       };
@@ -527,6 +541,7 @@ const Chat = {
 
     const response = await fetch("/chats");
     if (!response.ok) {
+      Utils.verifyToast();
       createErrorAlert("Error fetching chats");
       return;
     }
