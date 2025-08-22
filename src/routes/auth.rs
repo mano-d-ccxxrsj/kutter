@@ -183,10 +183,10 @@ pub async fn register(
 
     match insert_result {
         Ok(user) => {
-            if let Err(e) = send_email(email, username, url) {
+            if let Err(_) = send_email(email, username, url) {
                 return HttpResponse::InternalServerError().json(json!({
                     "status": "error",
-                    "message": format!("failed to send verification email: {}", e),
+                    "message": "failed to send verification email",
                 }));
             }
             HttpResponse::Created().json(json!({
@@ -195,9 +195,9 @@ pub async fn register(
                 "user": user.username
             }))
         }
-        Err(e) => HttpResponse::InternalServerError().json(json!({
+        Err(_) => HttpResponse::InternalServerError().json(json!({
             "status": "error",
-            "message": format!("failed to create user: {}; {:?}", e, e),
+            "message": "failed to create user",
         })),
     }
 }
