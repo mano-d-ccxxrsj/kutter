@@ -1,5 +1,3 @@
-// we need fix the session management, is crashing everytime <--- ig its now fixed
-
 use crate::middlewares::verify_token;
 use actix_web::{Error, HttpRequest, HttpResponse, get, web};
 use actix_ws::Message;
@@ -274,7 +272,7 @@ pub async fn ws_handler(
                                                             "Error selecting replied message chat id: {}",
                                                             e
                                                         );
-                                                        return;
+                                                        continue; // hmmmmmmmmmmmmmmmm
                                                     }
                                                 };
 
@@ -357,7 +355,7 @@ pub async fn ws_handler(
                                                         let _ = tx.send(OutgoingMessage::NewMessage(message));
                                                     }
                                                     Err(e) => {
-                                                        println!("error sendind message: {}", e);
+                                                        println!("error sending message: {}", e);
                                                     }
                                                 }
                                             } else {
@@ -398,7 +396,7 @@ pub async fn ws_handler(
                                                     let _ = tx.send(OutgoingMessage::NewMessage(message));
                                                 }
                                                 Err(e) => {
-                                                    println!("error sendind message: {}", e)
+                                                    println!("error sending message: {}", e)
                                                 }
                                             }
                                         }

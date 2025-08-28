@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 use std::collections::HashMap;
 use std::sync::Arc;
+use tokio::select;
 use tokio::sync::{RwLock, broadcast};
 
 pub async fn friend_table(pool: &PgPool) -> Result<(), sqlx::Error> {
@@ -114,6 +115,8 @@ pub async fn ws_handler(
             },
         );
     }
+    let broadcast_user_sessions = user_sessions.clone();
+    let broadcast_email = email.clone();
 
     actix_rt::spawn(async move {
         while let Some(Ok(msg)) = msg_stream.next().await {
@@ -358,37 +361,72 @@ pub async fn ws_handler(
     });
 
     actix_rt::spawn(async move {
-        while let Ok(msg) = rx.recv().await {
-            let should_send = match &msg {
-                FriendAction::SendRequest(friend) => {
-                    broadcast_session_username == friend.receiver_username
-                    || broadcast_session_username == friend.sender_username
-                }
-                FriendAction::Accept(status) => {
-                    match sqlx::query_as::<_, Friends>(
-                        "SELECT * FROM friends WHERE id = $1 AND (sender_username = $2 OR receiver_username = $2)"
-                    )
-                    .bind(status.id)
-                    .bind(&broadcast_session_username)
-                    .fetch_optional(&second_spawn_db_pool)
-                    .await {
-                        Ok(Some(_)) => true,
-                        Ok(None) => false,
-                        Err(_) => false
+        let mut session_alive = true;
+
+        while session_alive {
+            select! {
+                msg = rx.recv() => {
+                    match msg {
+                        Ok(msg) => {
+                            let session_still_alive = {
+                                let sessions = broadcast_user_sessions.read().await;
+                                sessions.contains_key(&broadcast_email)
+                            };
+
+                            if !session_still_alive {
+                                session_alive = false;
+                                continue;
+                            }
+
+                            let should_send = match &msg {
+                                            FriendAction::SendRequest(friend) => {
+                                                broadcast_session_username == friend.receiver_username
+                                                || broadcast_session_username == friend.sender_username
+                                            }
+                                            FriendAction::Accept(status) => {
+                                                match sqlx::query_as::<_, Friends>(
+                                                    "SELECT * FROM friends WHERE id = $1 AND (sender_username = $2 OR receiver_username = $2)"
+                                                )
+                                                .bind(status.id)
+                                                .bind(&broadcast_session_username)
+                                                .fetch_optional(&second_spawn_db_pool)
+                                                .await {
+                                                    Ok(Some(_)) => true,
+                                                    Ok(None) => false,
+                                                    Err(_) => false
+                                                }
+                                            }
+                                        };
+
+                            if should_send {
+                                if let Err(_) = broadcast_session
+                                    .text(serde_json::to_string(&msg).unwrap())
+                                    .await
+                                {
+                                    session_alive = false;
+                                }
+                            }
+                        }
+                        Err(_) => {
+                            session_alive = false;
+                        }
                     }
                 }
-            };
 
-            if should_send {
-                if let Err(e) = broadcast_session
-                    .text(serde_json::to_string(&msg).unwrap())
-                    .await
-                {
-                    eprintln!("Error sending WS broadcast: {}", e);
+                _ = async {
+                    let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
+                    loop {
+                        interval.tick().await;
+                        let sessions = broadcast_user_sessions.read().await;
+                        if !sessions.contains_key(&broadcast_email) {
+                            break;
+                        }
+                    }
+                } => {
+                    session_alive = false;
                 }
             }
         }
-        println!("WebSocket message handler loop ended");
     });
     Ok(response)
 }

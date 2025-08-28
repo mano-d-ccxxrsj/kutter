@@ -260,6 +260,28 @@ nav .nav-buttons .theme-button:hover {
   justify-content: center;
   align-items: center;
 }
+.opacity .userConfigModal .logout-button {
+  position: absolute;
+  top: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: 2.5em;
+  cursor: pointer;
+  font-size: 1.5em;
+  color: var(--text);
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  padding: 0;
+  margin: 0;
+  z-index: 101;
+}
+.opacity .userConfigModal .logout-button:hover {
+  background-color: var(--hover);
+}
+.opacity .userConfigModal .logout-button i {
+  padding: 0.2em;
+}
 .opacity .userConfigModal .close-button {
   position: absolute;
   top: 0.5em;

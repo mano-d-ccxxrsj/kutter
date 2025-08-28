@@ -7,6 +7,9 @@ const DOM_ELEMENTS = {
   userConfigModalCloseButton: document.getElementById(
     "userConfigModalCloseButton",
   ),
+  userConfigModalLogoutButton: document.getElementById(
+    "userConfigModalLogoutButton",
+  ),
   modalPhotoConfig: document.getElementById("photoConfig"),
   modalPersonalInfo: document.getElementById("personalInfo"),
   fileInput: document.getElementById("photo-upload"),
@@ -189,6 +192,19 @@ const User = {
     DOM_ELEMENTS.userConfigModalCloseButton.addEventListener("click", () => {
       DOM_ELEMENTS.modalBase.style.display = "none";
     });
+
+    DOM_ELEMENTS.userConfigModalLogoutButton.addEventListener(
+      "click",
+      async () => {
+        await fetch("/logout", {
+          method: "DELETE",
+        });
+        createSuccessAlert("Logout successfully");
+        setTimeout(() => {
+          window.location.replace("/");
+        }, 1500);
+      },
+    );
 
     const modalPhotoDiv = document.createElement("div");
     modalPhotoDiv.classList.add("modalPhoto");
