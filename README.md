@@ -10,6 +10,7 @@ Kutter is writen in Rust with Actix Web and Actix Websocket for maximum performa
 
 # Routes and how to get it on Frontend
 
+## HTTP:
 | Route | Description | Type |
 | :--- | :---: | :---: |
 | `/register` | Get `username`, `email` and `password` and insert it to database | POST |
@@ -17,4 +18,4 @@ Kutter is writen in Rust with Actix Web and Actix Websocket for maximum performa
 | `/upload_avatar` | Get `fileInput` content and, save the image in /uploads(repository root directory) with `username` as name and convert it to png. Database receives only url of the image | POST |
 | `/verify` | Get `token` and try to select it in database, if it exists, return a token with `username` and `email`, else return an error | POST |
 
-continue if u want, i have bigger problems
+# continue if u want, i have bigger problems

@@ -311,6 +311,19 @@ nav {
             }
         }
 
+        & .version {
+            position: absolute;
+            bottom: 0.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            left: 0.5em;
+            color: variables.$border;
+            padding: 0;
+            margin: 0;
+            z-index: 101;
+        }
+
         & .modalUserInfo {
             display: flex;
             justify-content: center;
@@ -580,7 +593,7 @@ nav {
         }
     }
 
-    & .replied_message_container {
+    & .changed_message_container {
         position: fixed;
         bottom: 0;
         right: 0;
@@ -602,6 +615,18 @@ nav {
             gap: 1em;
 
             & .replied_user {
+                color: variables.$text;
+                font-weight: 900;
+            }
+        }
+
+        & .edit {
+            margin-left: 1em;
+            display: flex;
+            align-items: center;
+            gap: 1em;
+
+            & .edit_warning {
                 color: variables.$text;
                 font-weight: 900;
             }
@@ -1151,6 +1176,19 @@ nav {
                 & i {
                     padding: 0.2em;
                 }
+            }
+
+            & .version {
+                position: absolute;
+                bottom: 0.5em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                left: 0.5em;
+                color: variables.$border;
+                padding: 0;
+                margin: 0;
+                z-index: 101;
             }
 
             & .modalUserInfo {

@@ -304,6 +304,18 @@ nav .nav-buttons .theme-button:hover {
 .opacity .userConfigModal .close-button i {
   padding: 0.2em;
 }
+.opacity .userConfigModal .version {
+  position: absolute;
+  bottom: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 0.5em;
+  color: var(--border);
+  padding: 0;
+  margin: 0;
+  z-index: 101;
+}
 .opacity .userConfigModal .modalUserInfo {
   display: flex;
   justify-content: center;
@@ -538,7 +550,7 @@ nav .nav-buttons .theme-button:hover {
 .center_wrapper .chat_container .message_container .bottom .right_side .message_info .timestamp {
   font-size: 12px;
 }
-.center_wrapper .replied_message_container {
+.center_wrapper .changed_message_container {
   position: fixed;
   bottom: 0;
   right: 0;
@@ -553,17 +565,27 @@ nav .nav-buttons .theme-button:hover {
   justify-content: space-between;
   display: none;
 }
-.center_wrapper .replied_message_container .reply {
+.center_wrapper .changed_message_container .reply {
   margin-left: 1em;
   display: flex;
   align-items: center;
   gap: 1em;
 }
-.center_wrapper .replied_message_container .reply .replied_user {
+.center_wrapper .changed_message_container .reply .replied_user {
   color: var(--text);
   font-weight: 900;
 }
-.center_wrapper .replied_message_container .close_button {
+.center_wrapper .changed_message_container .edit {
+  margin-left: 1em;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+.center_wrapper .changed_message_container .edit .edit_warning {
+  color: var(--text);
+  font-weight: 900;
+}
+.center_wrapper .changed_message_container .close_button {
   margin-right: 1em;
   cursor: pointer;
   font-size: 24px;
@@ -573,7 +595,7 @@ nav .nav-buttons .theme-button:hover {
   justify-content: center;
   border: 1px solid var(--border);
 }
-.center_wrapper .replied_message_container .close_button:hover {
+.center_wrapper .changed_message_container .close_button:hover {
   background-color: var(--hover);
 }
 .center_wrapper .input_container {
@@ -1048,6 +1070,18 @@ nav .nav-buttons .theme-button:hover {
   }
   .opacity .userConfigModal .close-button i {
     padding: 0.2em;
+  }
+  .opacity .userConfigModal .version {
+    position: absolute;
+    bottom: 0.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 0.5em;
+    color: var(--border);
+    padding: 0;
+    margin: 0;
+    z-index: 101;
   }
   .opacity .userConfigModal .modalUserInfo {
     display: flex;

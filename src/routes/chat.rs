@@ -40,6 +40,12 @@ pub struct NewMessage {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct EditMessage {
+    pub message_id: i32,
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct NewChat {
     pub second_user_name: Option<String>,
 }
@@ -59,6 +65,7 @@ pub struct DeleteMessageRequest {
 #[serde(tag = "action", rename_all = "snake_case")]
 pub enum OutgoingMessage {
     NewMessage(ChatMessage),
+    EditMessage(ChatMessage),
     Delete { message_id: i32 },
     NewChat(Chat),
 }
@@ -272,7 +279,7 @@ pub async fn ws_handler(
                                                             "Error selecting replied message chat id: {}",
                                                             e
                                                         );
-                                                        continue; // hmmmmmmmmmmmmmmmm
+                                                        continue;
                                                     }
                                                 };
 
@@ -316,10 +323,6 @@ pub async fn ws_handler(
                                                         return;
                                                     }
                                                 };
-
-                                                println!("Replied user: {:?}", replied_user);
-
-                                                println!("Replied message: {:?}", replied_message);
 
                                                 match sqlx::query_as::<_, ChatMessage>(
                                                     "INSERT INTO messages (chat_id, email, username, message, replied_user, replied_message, time) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *"
@@ -401,6 +404,54 @@ pub async fn ws_handler(
                                             }
                                         }
                                     }
+                                }
+                            }
+                            "edit_message" => {
+                                if let Ok(edit_message) =
+                                    serde_json::from_value::<EditMessage>(ws_msg.payload)
+                                {
+                                    match sqlx::query_scalar::<_, bool>(
+                                        "SELECT EXISTS(SELECT 1 FROM messages WHERE id = $1 AND username = $2)"
+                                    )
+                                    .bind(&edit_message.message_id)
+                                    .bind(&username)
+                                    .fetch_optional(&db_pool)
+                                    .await 
+                                    {
+                                        Ok(_) => {
+                                            match sqlx::query(
+                                                "UPDATE messages SET message = $1 WHERE id = $2"
+                                            )
+                                            .bind(&edit_message.message)
+                                            .bind(&edit_message.message_id)
+                                            .execute(&db_pool)
+                                            .await
+                                            {
+                                                Ok(_) => {
+                                                    match sqlx::query_as::<_, ChatMessage> (
+                                                        "SELECT * FROM messages WHERE id = $1"
+                                                    )
+                                                    .bind(&edit_message.message_id)
+                                                    .fetch_one(&db_pool)
+                                                    .await
+                                                    {
+                                                        Ok(message) => {
+                                                            let _ = tx.send(OutgoingMessage::EditMessage(message));
+                                                        }
+                                                        Err(e) => {
+                                                            println!("error sending message: {}", e);
+                                                        }
+                                                    }
+                                                }
+                                                Err(e) => {
+                                                    println!("error editing message: {}", e);
+                                                }
+                                            }
+                                        },
+                                        Err(_) => {
+                                            Some(false);
+                                        }
+                                    };
                                 }
                             }
                             "new_chat" => {
@@ -511,15 +562,16 @@ pub async fn ws_handler(
                     }
                 }
                 Message::Close(_) => {
-                    println!("(chat.rs) Session closed");
                     {
                         let mut sessions_write = user_sessions.write().await;
                         sessions_write.remove(&email);
                     }
-                    println!("session removed.");
+                    println!("(chat.rs): session closed and removed."); // logs
                     break;
                 }
-                _ => {}
+                _ => {
+                    break;
+                }
             }
         }
     });
@@ -576,6 +628,26 @@ pub async fn ws_handler(
                                 OutgoingMessage::NewChat(chat) => {
                                     chat.first_user_name == broadcast_email
                                         || chat.second_user_name == broadcast_email
+                                }
+                                OutgoingMessage::EditMessage(chat_msg) => {
+                                    if let Some(chat_id) = chat_msg.chat_id {
+                                        if current_user_chats.contains(&chat_id) {
+                                            true
+                                        } else {
+                                            match sqlx::query_scalar::<_, bool>(
+                                                "SELECT EXISTS(SELECT * FROM chats WHERE id = $1 AND (first_user_name = $2 OR second_user_name = $2))"
+                                            )
+                                            .bind(chat_id)
+                                            .bind(&broadcast_email)
+                                            .fetch_one(&second_db_pool)
+                                            .await {
+                                                Ok(exists) => exists,
+                                                Err(_) => false
+                                            }
+                                        }
+                                    } else {
+                                        false
+                                    }
                                 }
                             };
 

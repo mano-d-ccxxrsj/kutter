@@ -26,7 +26,7 @@ const DOM_ELEMENTS = {
   inputContainer: document.getElementById("input_container"),
   sendMessageInput: document.getElementById("send_message_input"),
   sendMessageButton: document.getElementById("send_message_button"),
-  repliedMessageContainer: document.getElementById("replied_message_container"),
+  changedMessageContainer: document.getElementById("changed_message_container"),
   chatsButton: document.getElementById("chats_button"),
   friendsButton: document.getElementById("friends_button"),
   left_side_wrapper: document.getElementById("left_side_wrapper"),
@@ -39,6 +39,7 @@ const APP_STATE = {
   currentUser: null,
   currentChatPartner: null,
   currentChatId: null,
+  currentEdit: null,
   hasToast: null,
   renderedChats: new Set(),
   renderedMessages: new Set(),
@@ -416,9 +417,59 @@ const Chat = {
     await Chat.setupWebSocket();
     await Chat.loadChats();
 
+    function editMessage() {
+      if (!APP_STATE.currentChatId) {
+        Utils.verifyToast();
+        createErrorAlert("Chat not ready. Please wait...");
+        return;
+      }
+
+      if (
+        !APP_STATE.sockets.chat ||
+        APP_STATE.sockets.chat.readyState !== WebSocket.OPEN
+      ) {
+        Utils.verifyToast();
+        createErrorAlert("Connection not ready. Please wait...");
+        return;
+      }
+
+      const message = DOM_ELEMENTS.sendMessageInput.textContent.trim();
+      if (!message) return;
+
+      const wsMessage = {
+        action: "edit_message",
+        payload: {
+          message_id: APP_STATE.currentEdit,
+          message: message,
+        },
+      };
+
+      try {
+        APP_STATE.sockets.chat.send(JSON.stringify(wsMessage));
+        DOM_ELEMENTS.sendMessageInput.textContent = "";
+        if (APP_STATE.currentEdit !== null) {
+          const edit = document.getElementById(
+            `edit_${APP_STATE.currentEdit}`,
+          );
+          const close_button = document.getElementById(
+            `close_button_${APP_STATE.currentEdit}`,
+          );
+          edit.remove();
+          close_button.remove();
+          APP_STATE.currentEdit = null;
+          DOM_ELEMENTS.changedMessageContainer.style.display = "none";
+          DOM_ELEMENTS.chatContainer.style.marginBottom = "84px";
+        }
+
+      } catch (e) {
+        Utils.verifyToast();
+        createErrorAlert("Failed to edit message");
+        console.error("Error editing message:", e);
+      }
+
+    }
+
     function sendMessage() {
-      console.log(APP_STATE.currentChatId);
-      console.log(APP_STATE.currentChatPartner);
       if (!APP_STATE.currentChatId) {
         Utils.verifyToast();
         createErrorAlert("Chat not ready. Please wait...");
@@ -459,7 +510,7 @@ const Chat = {
           reply.remove();
           close_button.remove();
           APP_STATE.currentReply = null;
-          DOM_ELEMENTS.repliedMessageContainer.style.display = "none";
+          DOM_ELEMENTS.changedMessageContainer.style.display = "none";
           DOM_ELEMENTS.chatContainer.style.marginBottom = "84px";
         }
       } catch (e) {
@@ -469,11 +520,22 @@ const Chat = {
       }
     }
 
-    DOM_ELEMENTS.sendMessageButton.onclick = () => sendMessage();
+    DOM_ELEMENTS.sendMessageButton.onclick = () => {
+        if (!APP_STATE.currentEdit) {
+          sendMessage();
+        } else {
+          editMessage();
+        }
+
+    };
     DOM_ELEMENTS.sendMessageInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        sendMessage();
+        if (!APP_STATE.currentEdit) {
+          sendMessage();
+        } else {
+          editMessage();
+        }
       }
     });
   },
@@ -500,7 +562,7 @@ const Chat = {
           if (data.action === "new_message") {
             if (data.chat_id === APP_STATE.currentChatId) {
               const messageId = `${data.id}_${data.username}`;
-              const can_delete =
+              const can_change =
                 APP_STATE.currentUser.username === data.username ? true : false;
               const has_reply =
                 data.replied_user || data.replied_message ? true : false;
@@ -512,7 +574,7 @@ const Chat = {
                   data.replied_user,
                   data.replied_message,
                   data.time,
-                  can_delete,
+                  can_change,
                   has_reply,
                 );
                 APP_STATE.renderedMessages.add(messageId);
@@ -533,6 +595,11 @@ const Chat = {
                 ? data.second_user_name
                 : data.first_user_name;
             Chat.loadChats();
+          } else if (data.action === "edit_message") {
+            if (data.chat_id === APP_STATE.currentChatId) {
+              const message = document.getElementById(`raw_${data.id}`);
+              message.textContent = `${data.message}`;
+            }
           }
         } catch (e) {
           console.error("Error parsing chat message", e);
@@ -588,7 +655,6 @@ const Chat = {
     const chatDiv = document.createElement("div");
     chatDiv.classList.add("chat");
     chatDiv.id = `c${id}`;
-    console.log(id);
 
     const chatPhoto = document.createElement("div");
     chatPhoto.classList.add("photo");
@@ -613,14 +679,12 @@ const Chat = {
   },
 
   loadChat: async (chatId, username) => {
-    console.log(chatId);
     if (chatId === APP_STATE.currentChatId) return;
 
     DOM_ELEMENTS.chatContainer.innerHTML = "";
     APP_STATE.renderedMessages.clear();
     APP_STATE.currentChatId = chatId;
     APP_STATE.currentChatPartner = username;
-    console.log(chatId);
 
     if (APP_STATE.currentReply !== null) {
       const reply = document.getElementById(`reply_${APP_STATE.currentReply}`);
@@ -630,7 +694,7 @@ const Chat = {
       reply.remove();
       close_button.remove();
       APP_STATE.currentReply = null;
-      DOM_ELEMENTS.repliedMessageContainer.style.display = "none";
+      DOM_ELEMENTS.changedMessageContainer.style.display = "none";
       DOM_ELEMENTS.chatContainer.style.marginBottom = "84px";
     }
 
@@ -678,7 +742,7 @@ const Chat = {
     const messages = await response.json();
     messages.forEach((message) => {
       const messageId = `${message.id || message.timestamp}_${message.username}`;
-      const can_delete =
+      const can_change =
         APP_STATE.currentUser.username === message.username ? true : false;
       const has_reply =
         message.replied_user || message.replied_message ? true : false;
@@ -690,7 +754,7 @@ const Chat = {
           message.replied_user,
           message.replied_message,
           message.time,
-          can_delete,
+          can_change,
           has_reply,
         );
         APP_STATE.renderedMessages.add(messageId);
@@ -710,7 +774,7 @@ const Chat = {
     fetch_replied_user,
     fetch_replied_message,
     timestamp,
-    can_delete,
+    can_change,
     has_reply,
   ) => {
     const messageContainer = document.createElement("div");
@@ -752,7 +816,6 @@ const Chat = {
     reply_button.textContent = "Reply";
     reply_button.addEventListener("click", () => {
       DOM_ELEMENTS.sendMessageInput.focus();
-      console.log("message id: ", message_id);
       if (APP_STATE.currentReply) {
         const reply = document.getElementById(
           `reply_${APP_STATE.currentReply}`,
@@ -765,16 +828,10 @@ const Chat = {
         if (APP_STATE.currentReply === message_id) {
           reply.remove();
           close_button.remove();
-          console.log(
-            "app state value: ",
-            APP_STATE.currentReply,
-            "second message id: ",
-            message_id,
-          );
         }
       }
       APP_STATE.currentReply = message_id;
-      DOM_ELEMENTS.repliedMessageContainer.style.display = "flex";
+      DOM_ELEMENTS.changedMessageContainer.style.display = "flex";
       DOM_ELEMENTS.chatContainer.style.marginBottom = "139px";
       DOM_ELEMENTS.chatContainer.scrollTop =
         DOM_ELEMENTS.chatContainer.scrollHeight;
@@ -789,10 +846,9 @@ const Chat = {
       close_button.appendChild(close_button_icon);
       close_button.addEventListener("click", () => {
         APP_STATE.currentReply = null;
-        console.log(APP_STATE.currentReply);
         reply.remove();
         close_button.remove();
-        DOM_ELEMENTS.repliedMessageContainer.style.display = "none";
+        DOM_ELEMENTS.changedMessageContainer.style.display = "none";
         DOM_ELEMENTS.chatContainer.style.marginBottom = "84px";
       });
       const replied_message = document.createElement("p");
@@ -802,14 +858,66 @@ const Chat = {
       replied_user.id = `replied_user_${message_id}`;
       replied_user.classList.add("replied_user");
       replied_user.textContent = `@${username}:`;
-      console.log("second app state value: ", APP_STATE.currentReply);
       replied_message.textContent = `${message}`;
       reply.appendChild(replied_user);
       reply.appendChild(replied_message);
-      DOM_ELEMENTS.repliedMessageContainer.appendChild(reply);
-      DOM_ELEMENTS.repliedMessageContainer.appendChild(close_button);
+      DOM_ELEMENTS.changedMessageContainer.appendChild(reply);
+      DOM_ELEMENTS.changedMessageContainer.appendChild(close_button);
     });
     options.appendChild(reply_button);
+
+    const edit_button = document.createElement("p");
+    edit_button.classList.add("buttons");
+    edit_button.textContent = "Edit";
+    edit_button.addEventListener("click", () => {
+      DOM_ELEMENTS.sendMessageInput.focus();
+      if (APP_STATE.currentEdit) {
+        const edit = document.getElementById(
+          `edit_${APP_STATE.currentEdit}`,
+        );
+        const close_button = document.getElementById(
+          `close_button_${APP_STATE.currentEdit}`,
+        );
+        close_button.remove();
+        edit.remove();
+        if (APP_STATE.currentEdit === message_id) {
+          edit.remove();
+          close_button.remove();
+        }
+      }
+      APP_STATE.currentEdit = message_id;
+      DOM_ELEMENTS.changedMessageContainer.style.display = "flex";
+      DOM_ELEMENTS.chatContainer.style.marginBottom = "139px";
+      DOM_ELEMENTS.chatContainer.scrollTop = DOM_ELEMENTS.chatContainer.scrollHeight;
+      const edit = document.createElement("div");
+      edit.classList.add("edit");
+      edit.id = `edit_${message_id}`;
+      const close_button = document.createElement("div");
+      close_button.classList.add("close_button");
+      close_button.id = `close_button_${message_id}`;
+      const close_button_icon = document.createElement("i");
+      close_button_icon.classList.add("bx", "bx-x");
+      close_button.appendChild(close_button_icon);
+      close_button.addEventListener("click", () => {
+        APP_STATE.currentEdit = null;
+        edit.remove();
+        close_button.remove();
+        DOM_ELEMENTS.changedMessageContainer.style.display = "none";
+        DOM_ELEMENTS.chatContainer.style.marginBottom = "84px";
+      });
+      const edit_message = document.createElement("p");
+      const edit_warning = document.createElement("p");
+      edit_message.id = `edit_message_${message_id}`;
+      edit_message.classList.add("edit_message");
+      edit_warning.id = `edit_warning_${message_id}`;
+      edit_warning.classList.add("edit_warning");
+      edit_warning.textContent = `Editing:`;
+      edit_message.textContent = `${message}`;
+      edit.appendChild(edit_warning);
+      edit.appendChild(edit_message);
+      DOM_ELEMENTS.changedMessageContainer.appendChild(edit);
+      DOM_ELEMENTS.changedMessageContainer.appendChild(close_button);
+    });
 
     const deleteWsMessage = {
       action: "delete_message",
@@ -824,7 +932,8 @@ const Chat = {
     delete_button.addEventListener("click", () => {
       APP_STATE.sockets.chat.send(JSON.stringify(deleteWsMessage));
     });
-    if (can_delete) {
+    if (can_change) {
+      options.appendChild(edit_button);
       options.appendChild(delete_button);
     }
     messageContainer.appendChild(options);
@@ -860,6 +969,7 @@ const Chat = {
 
     const rawMessage = document.createElement("p");
     rawMessage.classList.add("message");
+    rawMessage.id = `raw_${message_id}`
     rawMessage.textContent = message;
     rightSide.appendChild(rawMessage);
 

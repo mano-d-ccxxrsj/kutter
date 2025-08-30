@@ -345,16 +345,15 @@ pub async fn ws_handler(
                     }
                 }
                 Message::Close(_) => {
-                    println!("(friend.rs): Session closed");
                     {
                         let mut sessions = user_sessions.write().await;
                         sessions.remove(&email);
                     }
-                    println!("session removed.");
+                    println!("(friend.rs): session closed and removed."); // logs
                     break;
                 }
                 _ => {
-                    println!("Received other message type: {:?}", msg);
+                    break;
                 }
             }
         }
