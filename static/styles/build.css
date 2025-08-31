@@ -315,6 +315,10 @@ nav .nav-buttons .theme-button:hover {
   padding: 0;
   margin: 0;
   z-index: 101;
+  text-decoration: underline;
+}
+.opacity .userConfigModal .version:hover {
+  color: var(--text);
 }
 .opacity .userConfigModal .modalUserInfo {
   display: flex;
@@ -956,57 +960,37 @@ nav .nav-buttons .theme-button:hover {
   overflow: none;
 }
 
-.e404 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text);
-  background-color: var(--bg);
-  flex-direction: column;
-  height: 100dvh;
-  width: 100vw;
-  font-size: 1.2em;
-  box-sizing: border-box;
-}
-.e404 div {
+.changelog {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  font-size: 1.2em;
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-.e404 div hr {
-  border: 1px solid var(--border);
-  width: 100%;
-  margin: 0;
-}
-.e404 div h1 {
-  color: var(--accent);
-}
-.e404 div p {
-  padding: 0 0.5em 0 0.5em;
-}
-.e404 div a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5em;
-}
-.e404 div a button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border);
+  gap: 1em;
+  height: 90dvh;
   background-color: var(--bg);
   color: var(--text);
+}
+.changelog .version {
+  max-width: 600px;
+}
+.changelog .version hr {
+  border: 1px solid var(--border);
+}
+.changelog .version h1 {
+  font-size: 2.5em;
+  margin-bottom: 1em;
+  text-decoration: underline var(--accent);
+}
+.changelog button {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 1em;
+  cursor: pointer;
   font-size: 1em;
   font-weight: bold;
-  padding: 0.5em 1em;
-  cursor: pointer;
 }
-.e404 div a button:hover {
+.changelog button:hover {
   background-color: var(--hover);
 }
 
@@ -1082,6 +1066,10 @@ nav .nav-buttons .theme-button:hover {
     padding: 0;
     margin: 0;
     z-index: 101;
+    text-decoration: underline;
+  }
+  .opacity .userConfigModal .version:hover {
+    color: var(--text);
   }
   .opacity .userConfigModal .modalUserInfo {
     display: flex;

@@ -322,6 +322,11 @@ nav {
             padding: 0;
             margin: 0;
             z-index: 101;
+            text-decoration: underline;
+
+            &:hover {
+                color: variables.$text;
+            }
         }
 
         & .modalUserInfo {
@@ -1051,63 +1056,41 @@ nav {
     }
 }
 
-.e404 {
+.changelog {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: variables.$text;
-    background-color: variables.$bg;
     flex-direction: column;
-    height: 100dvh;
-    width: 100vw;
-    font-size: 1.2em;
-    box-sizing: border-box;
+    gap: 1em;
+    height: 90dvh;
+    background-color: variables.$bg;
+    color: variables.$text;
 
-    & div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        font-size: 1.2em;
-        color: variables.$text;
-        border: 1px solid variables.$border;
+    & .version {
+        max-width: 600px;
 
         & hr {
             border: 1px solid variables.$border;
-            width: 100%;
-            margin: 0;
         }
 
         & h1 {
-            color: variables.$accent;
+            font-size: 2.5em;
+            margin-bottom: 1em;
+            text-decoration: underline variables.$accent;
         }
+    }
 
-        & p {
-            padding: 0 0.5em 0 0.5em;
-        }
+    & button {
+        background-color: variables.$bg;
+        border: 1px solid variables.$border;
+        color: variables.$text;
+        padding: 1em;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
 
-        & a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5em;
-
-            & button {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid variables.$border;
-                background-color: variables.$bg;
-                color: variables.$text;
-                font-size: 1em;
-                font-weight: bold;
-                padding: 0.5em 1em;
-                cursor: pointer;
-
-                &:hover {
-                    background-color: variables.$hover;
-                }
-            }
+        &:hover {
+            background-color: variables.$hover;
         }
     }
 }
@@ -1189,6 +1172,11 @@ nav {
                 padding: 0;
                 margin: 0;
                 z-index: 101;
+                text-decoration: underline;
+
+                &:hover {
+                    color: variables.$text;
+                }
             }
 
             & .modalUserInfo {

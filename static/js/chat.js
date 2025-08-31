@@ -817,6 +817,10 @@ const Chat = {
       photo.classList.add("photo");
       const img = document.createElement("img");
       img.src = `/uploads/${fetch_replied_user}.png`;
+      img.onerror = () => {
+        img.src =
+          "/uploads/40237818034128031427800137284873941207891342780912374098.jpg";
+      };
       photo.appendChild(img);
       reply_message.textContent = fetch_replied_message;
       reply_container.appendChild(replying_to);
