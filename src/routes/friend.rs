@@ -349,10 +349,15 @@ pub async fn ws_handler(
                         let mut sessions = user_sessions.write().await;
                         sessions.remove(&email);
                     }
-                    println!("(friend.rs): session closed and removed."); // logs
+                    println!("(friend.rs): session closed and removed.");
                     break;
                 }
                 _ => {
+                    {
+                        let mut sessions = user_sessions.write().await;
+                        sessions.remove(&email);
+                    }
+                    println!("(friend.rs): session closed and removed.");
                     break;
                 }
             }

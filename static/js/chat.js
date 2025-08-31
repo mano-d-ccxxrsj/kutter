@@ -50,6 +50,30 @@ const APP_STATE = {
 };
 
 const Utils = {
+  clearAppState: () => {
+    if (APP_STATE.currentReply !== null) {
+      const reply = document.getElementById(`reply_${APP_STATE.currentReply}`);
+      const replyCloseButton = document.getElementById(
+        `close_button_${APP_STATE.currentReply}`,
+      );
+      reply?.remove();
+      replyCloseButton?.remove();
+      APP_STATE.currentReply = null;
+    }
+
+    if (APP_STATE.currentEdit !== null) {
+      const edit = document.getElementById(`edit_${APP_STATE.currentEdit}`);
+      const editCloseButton = document.getElementById(
+        `close_button_${APP_STATE.currentEdit}`,
+      );
+      edit?.remove();
+      editCloseButton?.remove();
+      APP_STATE.currentEdit = null;
+    }
+
+    DOM_ELEMENTS.changedMessageContainer.style.display = "none";
+    DOM_ELEMENTS.chatContainer.style.marginBottom = "84px";
+  },
   verifyToast: () => {
     const notification = document.getElementById("notification");
     if (notification) {
@@ -448,9 +472,7 @@ const Chat = {
         APP_STATE.sockets.chat.send(JSON.stringify(wsMessage));
         DOM_ELEMENTS.sendMessageInput.textContent = "";
         if (APP_STATE.currentEdit !== null) {
-          const edit = document.getElementById(
-            `edit_${APP_STATE.currentEdit}`,
-          );
+          const edit = document.getElementById(`edit_${APP_STATE.currentEdit}`);
           const close_button = document.getElementById(
             `close_button_${APP_STATE.currentEdit}`,
           );
@@ -460,13 +482,11 @@ const Chat = {
           DOM_ELEMENTS.changedMessageContainer.style.display = "none";
           DOM_ELEMENTS.chatContainer.style.marginBottom = "84px";
         }
-
       } catch (e) {
         Utils.verifyToast();
         createErrorAlert("Failed to edit message");
         console.error("Error editing message:", e);
       }
-
     }
 
     function sendMessage() {
@@ -521,12 +541,11 @@ const Chat = {
     }
 
     DOM_ELEMENTS.sendMessageButton.onclick = () => {
-        if (!APP_STATE.currentEdit) {
-          sendMessage();
-        } else {
-          editMessage();
-        }
-
+      if (!APP_STATE.currentEdit) {
+        sendMessage();
+      } else {
+        editMessage();
+      }
     };
     DOM_ELEMENTS.sendMessageInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -816,20 +835,7 @@ const Chat = {
     reply_button.textContent = "Reply";
     reply_button.addEventListener("click", () => {
       DOM_ELEMENTS.sendMessageInput.focus();
-      if (APP_STATE.currentReply) {
-        const reply = document.getElementById(
-          `reply_${APP_STATE.currentReply}`,
-        );
-        const close_button = document.getElementById(
-          `close_button_${APP_STATE.currentReply}`,
-        );
-        close_button.remove();
-        reply.remove();
-        if (APP_STATE.currentReply === message_id) {
-          reply.remove();
-          close_button.remove();
-        }
-      }
+      Utils.clearAppState();
       APP_STATE.currentReply = message_id;
       DOM_ELEMENTS.changedMessageContainer.style.display = "flex";
       DOM_ELEMENTS.chatContainer.style.marginBottom = "139px";
@@ -871,24 +877,12 @@ const Chat = {
     edit_button.textContent = "Edit";
     edit_button.addEventListener("click", () => {
       DOM_ELEMENTS.sendMessageInput.focus();
-      if (APP_STATE.currentEdit) {
-        const edit = document.getElementById(
-          `edit_${APP_STATE.currentEdit}`,
-        );
-        const close_button = document.getElementById(
-          `close_button_${APP_STATE.currentEdit}`,
-        );
-        close_button.remove();
-        edit.remove();
-        if (APP_STATE.currentEdit === message_id) {
-          edit.remove();
-          close_button.remove();
-        }
-      }
+      Utils.clearAppState();
       APP_STATE.currentEdit = message_id;
       DOM_ELEMENTS.changedMessageContainer.style.display = "flex";
       DOM_ELEMENTS.chatContainer.style.marginBottom = "139px";
-      DOM_ELEMENTS.chatContainer.scrollTop = DOM_ELEMENTS.chatContainer.scrollHeight;
+      DOM_ELEMENTS.chatContainer.scrollTop =
+        DOM_ELEMENTS.chatContainer.scrollHeight;
       const edit = document.createElement("div");
       edit.classList.add("edit");
       edit.id = `edit_${message_id}`;
@@ -969,7 +963,7 @@ const Chat = {
 
     const rawMessage = document.createElement("p");
     rawMessage.classList.add("message");
-    rawMessage.id = `raw_${message_id}`
+    rawMessage.id = `raw_${message_id}`;
     rawMessage.textContent = message;
     rightSide.appendChild(rawMessage);
 

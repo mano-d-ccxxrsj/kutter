@@ -416,7 +416,7 @@ pub async fn ws_handler(
                                     .bind(&edit_message.message_id)
                                     .bind(&username)
                                     .fetch_optional(&db_pool)
-                                    .await 
+                                    .await
                                     {
                                         Ok(_) => {
                                             match sqlx::query(
@@ -566,10 +566,15 @@ pub async fn ws_handler(
                         let mut sessions_write = user_sessions.write().await;
                         sessions_write.remove(&email);
                     }
-                    println!("(chat.rs): session closed and removed."); // logs
+                    println!("(chat.rs): session closed and removed.");
                     break;
                 }
                 _ => {
+                    {
+                        let mut sessions_write = user_sessions.write().await;
+                        sessions_write.remove(&email);
+                    }
+                    println!("(chat.rs): session closed and removed.");
                     break;
                 }
             }
