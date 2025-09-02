@@ -3,9 +3,9 @@
   --bg: #ffffff;
   --text: #000000;
   --border: #e0e0e0;
-  --accent:rgb(183, 159, 214);
+  --accent: #bc9ff5;
   --hover: #f0f0f0;
-  --hover-accent: #e6e6fa;
+  --hover-accent: #9f7ae6;
   --error: #a80000;
   --error-bg: #e7bebe;
   --success: #007a00;
@@ -92,8 +92,10 @@ nav .nav-buttons button:hover {
   background-color: var(--hover);
 }
 nav .nav-buttons .theme-button {
-  font-size: 12px;
   background-color: var(--accent);
+}
+nav .nav-buttons .theme-button i {
+  font-size: 1em;
 }
 nav .nav-buttons .theme-button:hover {
   background-color: var(--hover-accent);
@@ -539,7 +541,12 @@ nav .nav-buttons .theme-button:hover {
   align-items: start;
   gap: 5px;
 }
-.center_wrapper .chat_container .message_container .bottom .right_side p {
+.center_wrapper .chat_container .message_container .bottom .right_side .message_sub_container {
+  margin: 0;
+  display: flex;
+  justify-content: end;
+}
+.center_wrapper .chat_container .message_container .bottom .right_side .message_sub_container .message {
   margin: 0;
 }
 .center_wrapper .chat_container .message_container .bottom .right_side .message_info {
@@ -549,10 +556,17 @@ nav .nav-buttons .theme-button:hover {
   width: 100%;
 }
 .center_wrapper .chat_container .message_container .bottom .right_side .message_info .username {
+  margin: 0;
   font-weight: bold;
 }
 .center_wrapper .chat_container .message_container .bottom .right_side .message_info .timestamp {
+  margin: 0;
   font-size: 12px;
+}
+.center_wrapper .chat_container .message_container .bottom .right_side .message_info .edit_warning {
+  margin: 0;
+  font-size: 10px;
+  font-style: italic;
 }
 .center_wrapper .changed_message_container {
   position: fixed;
@@ -731,8 +745,10 @@ nav .nav-buttons .theme-button:hover {
   border: none;
   cursor: pointer;
   height: 100%;
-  font-size: 12px;
-  min-width: 3em;
+  min-width: 4em;
+}
+.left-sidebar-wrapper .left-sidebar .header .theme-button i {
+  font-size: 1.5em;
 }
 .left-sidebar-wrapper .left-sidebar .header .theme-button:hover {
   background-color: var(--hover);
@@ -962,16 +978,16 @@ nav .nav-buttons .theme-button:hover {
 
 .changelog {
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
+  align-items: center;
   gap: 1em;
   height: 90dvh;
   background-color: var(--bg);
   color: var(--text);
+  overflow: auto;
 }
 .changelog .version {
-  max-width: 600px;
+  width: 600px;
 }
 .changelog .version hr {
   border: 1px solid var(--border);
@@ -1602,8 +1618,10 @@ nav .nav-buttons .theme-button:hover {
     border: none;
     cursor: pointer;
     height: 100%;
-    font-size: 12px;
-    min-width: 3em;
+    min-width: 4em;
+  }
+  .left-sidebar-wrapper .left-sidebar .header .theme-button i {
+    font-size: 1.5em;
   }
   .left-sidebar-wrapper .left-sidebar .header .theme-button:hover {
     background-color: var(--hover);

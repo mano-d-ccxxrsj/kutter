@@ -580,6 +580,7 @@ const Chat = {
           const data = JSON.parse(event.data);
           if (data.action === "new_message") {
             if (data.chat_id === APP_STATE.currentChatId) {
+              Chat.loadChats();
               const messageId = `${data.id}_${data.username}`;
               const can_change =
                 APP_STATE.currentUser.username === data.username ? true : false;
@@ -618,6 +619,19 @@ const Chat = {
             if (data.chat_id === APP_STATE.currentChatId) {
               const message = document.getElementById(`raw_${data.id}`);
               message.textContent = `${data.message}`;
+              const messageInfo = document.getElementById(
+                `message_info_${data.id}`,
+              );
+              const already_edited = document.getElementById(
+                `edit_warning_${data.id}`,
+              );
+              if (!already_edited) {
+                const edit_warning = document.createElement("p");
+                edit_warning.textContent = "(edited)";
+                edit_warning.classList.add("edit_warning");
+                edit_warning.id = `edit_warning_${data.id}`;
+                messageInfo.appendChild(edit_warning);
+              }
             }
           }
         } catch (e) {
@@ -649,8 +663,6 @@ const Chat = {
     }
 
     const data = await response.json();
-
-    // TODO: sort chats by last_update
 
     await Promise.all(
       data.map(async (chat) => {
@@ -775,6 +787,7 @@ const Chat = {
           message.time,
           can_change,
           has_reply,
+          message.edited,
         );
         APP_STATE.renderedMessages.add(messageId);
       }
@@ -795,6 +808,7 @@ const Chat = {
     timestamp,
     can_change,
     has_reply,
+    edited,
   ) => {
     const messageContainer = document.createElement("div");
     messageContainer.classList.add("message_container");
@@ -802,6 +816,11 @@ const Chat = {
     top.classList.add("top");
     const bottom = document.createElement("div");
     bottom.classList.add("bottom");
+
+    const edit_warning = document.createElement("p");
+    edit_warning.textContent = "(edited)";
+    edit_warning.classList.add("edit_warning");
+    edit_warning.id = `edit_warning_${message_id}`;
 
     if (has_reply) {
       const reply_container = document.createElement("div");
@@ -955,6 +974,7 @@ const Chat = {
 
     const messageInfo = document.createElement("div");
     messageInfo.classList.add("message_info");
+    messageInfo.id = `message_info_${message_id}`;
     const messageUsername = document.createElement("p");
     messageUsername.classList.add("username");
     messageUsername.textContent = `@${username}`;
@@ -963,13 +983,21 @@ const Chat = {
     messageTimestamp.textContent = Utils.formatTimestamp(timestamp);
     messageInfo.appendChild(messageUsername);
     messageInfo.appendChild(messageTimestamp);
+    if (edited) {
+      messageInfo.appendChild(edit_warning);
+    }
     rightSide.appendChild(messageInfo);
+
+    const message_sub_container = document.createElement("div");
+    message_sub_container.classList.add("message_sub_container");
 
     const rawMessage = document.createElement("p");
     rawMessage.classList.add("message");
     rawMessage.id = `raw_${message_id}`;
     rawMessage.textContent = message;
-    rightSide.appendChild(rawMessage);
+    message_sub_container.appendChild(rawMessage);
+
+    rightSide.appendChild(message_sub_container);
 
     messageContainer.id = `${message_id}`;
 

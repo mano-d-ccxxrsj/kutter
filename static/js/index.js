@@ -6,9 +6,13 @@ function toggleTheme() {
   if (theme == "dark") {
     localStorage.setItem("theme", "light");
     document.documentElement.classList.remove("dark");
+    themeIcon.classList.remove("bx-moon");
+    themeIcon.classList.add("bx-sun");
   } else {
     localStorage.setItem("theme", "dark");
     document.documentElement.classList.add("dark");
+    themeIcon.classList.remove("bx-sun");
+    themeIcon.classList.add("bx-moon");
   }
 }
 
@@ -18,8 +22,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const theme = localStorage.getItem("theme");
   if (theme == "dark") {
     document.documentElement.classList.add("dark");
+    if (themeIcon.classList.contains("bx-sun")) {
+      themeIcon.classList.remove("bx-sun");
+    }
+    themeIcon.classList.add("bx-moon");
   } else if (theme == "light") {
     document.documentElement.classList.remove("dark");
+    if (themeIcon.classList.contains("bx-moon")) {
+      themeIcon.classList.remove("bx-moon");
+    }
+    themeIcon.classList.add("bx-sun");
   }
 });
 

@@ -73,8 +73,11 @@ nav {
         }
 
         .theme-button {
-            font-size: 12px;
             background-color: variables.$accent;
+
+            & i {
+                font-size: 1em;
+            }
 
             &:hover {
                 background-color: variables.$hover-accent;
@@ -575,8 +578,14 @@ nav {
                     align-items: start;
                     gap: 5px;
 
-                    & p {
+                    & .message_sub_container {
                         margin: 0;
+                        display: flex;
+                        justify-content: end;
+
+                        & .message {
+                            margin: 0;
+                        }
                     }
 
                     & .message_info {
@@ -586,11 +595,19 @@ nav {
                         width: 100%;
 
                         & .username {
+                            margin: 0;
                             font-weight: bold;
                         }
 
                         & .timestamp {
+                            margin: 0;
                             font-size: 12px;
+                        }
+
+                        & .edit_warning {
+                            margin: 0;
+                            font-size: 10px;
+                            font-style: italic;
                         }
                     }
                 }
@@ -792,8 +809,11 @@ nav {
                 border: none;
                 cursor: pointer;
                 height: 100%;
-                font-size: 12px;
-                min-width: 3em;
+                min-width: 4em;
+
+                & i {
+                    font-size: 1.5em;
+                }
 
                 &:hover {
                     background-color: variables.$hover;
@@ -1058,16 +1078,16 @@ nav {
 
 .changelog {
     display: flex;
-    align-items: center;
-    justify-content: center;
     flex-direction: column;
+    align-items: center;
     gap: 1em;
     height: 90dvh;
     background-color: variables.$bg;
     color: variables.$text;
+    overflow: auto;
 
     & .version {
-        max-width: 600px;
+        width: 600px;
 
         & hr {
             border: 1px solid variables.$border;
@@ -1783,8 +1803,11 @@ nav {
                     border: none;
                     cursor: pointer;
                     height: 100%;
-                    font-size: 12px;
-                    min-width: 3em;
+                    min-width: 4em;
+
+                    & i {
+                        font-size: 1.5em;
+                    }
 
                     &:hover {
                         background-color: variables.$hover;

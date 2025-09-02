@@ -22,6 +22,7 @@ pub struct ChatMessage {
     pub replied_user: Option<String>,
     pub replied_message: Option<String>,
     pub time: DateTime<Utc>,
+    pub edited: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
@@ -95,7 +96,8 @@ pub async fn create_table(pool: &PgPool) -> Result<(), sqlx::Error> {
             message TEXT NOT NULL,
             replied_user TEXT,
             replied_message TEXT,
-            time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+            edited BOOLEAN NOT NULL DEFAULT FALSE
         )
         "#,
     )
@@ -420,7 +422,7 @@ pub async fn ws_handler(
                                     {
                                         Ok(_) => {
                                             match sqlx::query(
-                                                "UPDATE messages SET message = $1 WHERE id = $2"
+                                                "UPDATE messages SET message = $1, edited = true WHERE id = $2"
                                             )
                                             .bind(&edit_message.message)
                                             .bind(&edit_message.message_id)
@@ -519,7 +521,7 @@ pub async fn ws_handler(
                                     serde_json::from_value::<DeleteMessageRequest>(ws_msg.payload)
                                 {
                                     match sqlx::query_as::<_, ChatMessage>(
-                                        "SELECT id, chat_id, email, username, message, replied_user, replied_message, time FROM messages WHERE id = $1"
+                                        "SELECT id, chat_id, email, username, message, replied_user, replied_message, time, edited FROM messages WHERE id = $1"
                                     )
                                     .bind(delete_req.id)
                                     .fetch_optional(&db_pool)
@@ -738,7 +740,7 @@ pub async fn get_chats(
     let username = claims.email.clone();
 
     match sqlx::query_as::<_, Chat>(
-        "SELECT id, first_user_name, second_user_name, last_update FROM chats WHERE first_user_name = $1 OR second_user_name = $1",
+        "SELECT id, first_user_name, second_user_name, last_update FROM chats WHERE first_user_name = $1 OR second_user_name = $1 ORDER BY last_update ASC",
     )
     .bind(&username)
     .fetch_all(&state.db_pool)
@@ -791,7 +793,7 @@ pub async fn get_chat_messages(
     }
 
     match sqlx::query_as::<_, ChatMessage>(
-        "SELECT id, chat_id, email, username, message, replied_user, replied_message, time FROM messages WHERE chat_id = $1 ORDER BY time ASC",
+        "SELECT id, chat_id, email, username, message, replied_user, replied_message, time, edited FROM messages WHERE chat_id = $1 ORDER BY time ASC",
     )
     .bind(chat_id)
     .fetch_all(&state.db_pool)
