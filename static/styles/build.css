@@ -762,6 +762,7 @@ nav .nav-buttons .theme-button:hover {
   bottom: 0;
   margin-top: 73px;
   margin-bottom: 85px;
+  overflow-y: auto;
 }
 .left-sidebar-wrapper .left-sidebar .chats .chat {
   width: 100%;

@@ -1,6 +1,6 @@
 [package]
 name = "Kutter"
-version = "0.1.2-beta"
+version = "0.1.2"
 edition = "2024"
 
 [dependencies]
