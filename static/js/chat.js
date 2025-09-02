@@ -654,11 +654,7 @@ const Chat = {
 
   loadChats: async () => {
     APP_STATE.renderedChats.clear();
-    while (DOM_ELEMENTS.chatsContainer.firstChild) {
-      DOM_ELEMENTS.chatsContainer.removeChild(
-        DOM_ELEMENTS.chatsContainer.firstChild,
-      );
-    }
+    DOM_ELEMENTS.chatsContainer.innerHTML = "";
 
     const response = await fetch("/chats");
     if (!response.ok) {
@@ -669,16 +665,17 @@ const Chat = {
 
     const data = await response.json();
 
-    data.forEach(async (chat) => {
+    for (const chat of data) {
       const chatId = `c${chat.id}`;
       const otherUser =
         APP_STATE.currentUser.username === chat.first_user_name
           ? chat.second_user_name
           : chat.first_user_name;
+
       const pfpUrl = await Utils.checkPfpExists(otherUser);
       Chat.createChat(otherUser, pfpUrl, chat.id);
       APP_STATE.renderedChats.add(chatId);
-    });
+    }
   },
 
   createChat: (username, pfp, id) => {
