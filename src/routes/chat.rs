@@ -740,7 +740,7 @@ pub async fn get_chats(
     let username = claims.email.clone();
 
     match sqlx::query_as::<_, Chat>(
-        "SELECT id, first_user_name, second_user_name, last_update FROM chats WHERE first_user_name = $1 OR second_user_name = $1 ORDER BY last_update ASC",
+        "SELECT id, first_user_name, second_user_name, last_update FROM chats WHERE first_user_name = $1 OR second_user_name = $1 ORDER BY last_update DESC",
     )
     .bind(&username)
     .fetch_all(&state.db_pool)

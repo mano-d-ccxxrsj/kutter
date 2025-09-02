@@ -579,8 +579,8 @@ const Chat = {
         try {
           const data = JSON.parse(event.data);
           if (data.action === "new_message") {
+            Chat.loadChats();
             if (data.chat_id === APP_STATE.currentChatId) {
-              Chat.loadChats();
               const messageId = `${data.id}_${data.username}`;
               const can_change =
                 APP_STATE.currentUser.username === data.username ? true : false;
@@ -654,6 +654,11 @@ const Chat = {
 
   loadChats: async () => {
     APP_STATE.renderedChats.clear();
+    while (DOM_ELEMENTS.chatsContainer.firstChild) {
+      DOM_ELEMENTS.chatsContainer.removeChild(
+        DOM_ELEMENTS.chatsContainer.firstChild,
+      );
+    }
 
     const response = await fetch("/chats");
     if (!response.ok) {
@@ -664,20 +669,16 @@ const Chat = {
 
     const data = await response.json();
 
-    await Promise.all(
-      data.map(async (chat) => {
-        const chatId = `c${chat.id}`;
-        const otherUser =
-          APP_STATE.currentUser.username === chat.first_user_name
-            ? chat.second_user_name
-            : chat.first_user_name;
-        const pfpUrl = await Utils.checkPfpExists(otherUser);
-        if (!APP_STATE.renderedChats.has(chatId)) {
-          Chat.createChat(otherUser, pfpUrl, chat.id);
-          APP_STATE.renderedChats.add(chatId);
-        }
-      }),
-    );
+    data.forEach(async (chat) => {
+      const chatId = `c${chat.id}`;
+      const otherUser =
+        APP_STATE.currentUser.username === chat.first_user_name
+          ? chat.second_user_name
+          : chat.first_user_name;
+      const pfpUrl = await Utils.checkPfpExists(otherUser);
+      Chat.createChat(otherUser, pfpUrl, chat.id);
+      APP_STATE.renderedChats.add(chatId);
+    });
   },
 
   createChat: (username, pfp, id) => {
