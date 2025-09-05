@@ -43,6 +43,7 @@ const APP_STATE = {
   hasToast: null,
   renderedChats: new Set(),
   renderedMessages: new Set(),
+  chats: new Array(),
   sockets: {
     friendReq: null,
     chat: null,
@@ -579,7 +580,7 @@ const Chat = {
         try {
           const data = JSON.parse(event.data);
           if (data.action === "new_message") {
-            Chat.loadChats();
+            Chat.reorderChats(data.chat_id);
             if (data.chat_id === APP_STATE.currentChatId) {
               const messageId = `${data.id}_${data.username}`;
               const can_change =
@@ -652,10 +653,14 @@ const Chat = {
     });
   },
 
-  loadChats: async () => {
-    APP_STATE.renderedChats.clear();
-    DOM_ELEMENTS.chatsContainer.innerHTML = "";
+  reorderChats: (chat_id) => {
+    const old_chat = document.getElementById(`c${chat_id}`);
+    old_chat.remove();
+    const chat = APP_STATE.chats.find(chat_obj => chat_obj.id === chat_id);
+    Chat.createChat(chat.username, chat.pfp, chat.id, false);
+  },
 
+  loadChats: async () => {
     const response = await fetch("/chats");
     if (!response.ok) {
       Utils.verifyToast();
@@ -665,21 +670,21 @@ const Chat = {
 
     const data = await response.json();
 
-    for (const chat of data) {
+    data.forEach((chat) => {
       const chatId = `c${chat.id}`;
       const otherUser =
         APP_STATE.currentUser.username === chat.first_user_name
           ? chat.second_user_name
           : chat.first_user_name;
 
-      const pfpUrl = await Utils.checkPfpExists(otherUser);
-      Chat.createChat(otherUser, pfpUrl, chat.id);
+      const pfpUrl = Utils.checkPfpExists(otherUser);
+      Chat.createChat(otherUser, pfpUrl, chat.id, true);
       APP_STATE.renderedChats.add(chatId);
-    }
+    });
   },
 
-  createChat: (username, pfp, id) => {
-    if (document.getElementById(`c${id}`)) return;
+  createChat: (username, pfp, id, first_load) => {
+    // if (document.getElementById(`c${id}`)) return;
 
     const chatDiv = document.createElement("div");
     chatDiv.classList.add("chat");
@@ -702,7 +707,20 @@ const Chat = {
 
     chatDiv.appendChild(chatPhoto);
     chatDiv.appendChild(chatUsername);
-    DOM_ELEMENTS.chatsContainer.appendChild(chatDiv);
+    
+    if (first_load) {
+      DOM_ELEMENTS.chatsContainer.appendChild(chatDiv);
+    } else {
+      DOM_ELEMENTS.chatsContainer.prepend(chatDiv);
+    }
+
+    let chat_array = {
+      username: username,
+      pfp: pfp,
+      id: id,
+    };
+
+    APP_STATE.chats.push(chat_array);
 
     chatDiv.addEventListener("click", () => Chat.loadChat(id, username));
   },
@@ -897,7 +915,9 @@ const Chat = {
     edit_button.classList.add("buttons");
     edit_button.textContent = "Edit";
     edit_button.addEventListener("click", () => {
+      const new_message = document.getElementById(`raw_${message_id}`); // change scope after
       DOM_ELEMENTS.sendMessageInput.focus();
+      DOM_ELEMENTS.sendMessageInput.textContent = `${new_message.textContent}`;
       Utils.clearAppState();
       APP_STATE.currentEdit = message_id;
       DOM_ELEMENTS.changedMessageContainer.style.display = "flex";
