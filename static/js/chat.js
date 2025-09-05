@@ -656,15 +656,9 @@ const Chat = {
   reorderChats: (chat_id) => {
     const old_chat = document.getElementById(`c${chat_id}`);
     const chat = APP_STATE.chats.find(chat_obj => chat_obj.id === chat_id);
-    if (APP_STATE.chats[0] === chat) {
-      console.log("---- temp log ----");
-      console.log(APP_STATE.chats); // remove this
-      console.log("top"); // remove this
-    } else {
+    if (APP_STATE.chats[0] !== chat) {
       old_chat.remove();
       Chat.createChat(chat.username, chat.pfp, chat.id, false);
-      console.log("---- temp log ----");
-      console.log(APP_STATE.chats) // remove this
     }
   },
 
@@ -678,19 +672,17 @@ const Chat = {
 
     const data = await response.json();
 
-    await Promise.all(
-      data.map(async (chat) => {
-        const chatId = `c${chat.id}`;
-        const otherUser =
-          APP_STATE.currentUser.username === chat.first_user_name
-            ? chat.second_user_name
-            : chat.first_user_name;
+    for (const chat of data) {
+      const chatId = `c${chat.id}`;
+      const otherUser =
+        APP_STATE.currentUser.username === chat.first_user_name
+          ? chat.second_user_name
+          : chat.first_user_name;
 
-        const pfpUrl = await Utils.checkPfpExists(otherUser);
-        Chat.createChat(otherUser, pfpUrl, chat.id, true);
-        APP_STATE.renderedChats.add(chatId);
-      })
-    );
+      const pfpUrl = await Utils.checkPfpExists(otherUser);
+      Chat.createChat(otherUser, pfpUrl, chat.id, true);
+      APP_STATE.renderedChats.add(chatId);
+    }
   },
 
   createChat: (username, pfp, id, first_load) => {
