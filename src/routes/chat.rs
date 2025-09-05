@@ -352,7 +352,7 @@ pub async fn ws_handler(
                                                         .execute(&db_pool)
                                                         .await
                                                         {
-                                                            Ok(_) => println!("Chat updated successfully"),
+                                                            Ok(_) => {},
                                                             Err(e) => {
                                                                 eprintln!("Error updating chat last update: {}", e);
                                                             }
@@ -393,7 +393,7 @@ pub async fn ws_handler(
                                                     .execute(&db_pool)
                                                     .await
                                                     {
-                                                        Ok(_) => println!("Chat updated successfully"),
+                                                        Ok(_) => {},
                                                         Err(e) => {
                                                             eprintln!("Error updating chat last update: {}", e);
                                                         }

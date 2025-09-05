@@ -722,8 +722,6 @@ const Chat = {
     if (existing_chat) {
       APP_STATE.chats = APP_STATE.chats.filter(chat_obj => chat_obj.id !== id);
     }
-
-
     
     if (first_load) {
       DOM_ELEMENTS.chatsContainer.appendChild(chatDiv);
