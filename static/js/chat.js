@@ -655,9 +655,17 @@ const Chat = {
 
   reorderChats: (chat_id) => {
     const old_chat = document.getElementById(`c${chat_id}`);
-    old_chat.remove();
     const chat = APP_STATE.chats.find(chat_obj => chat_obj.id === chat_id);
-    Chat.createChat(chat.username, chat.pfp, chat.id, false);
+    if (APP_STATE.chats[0] === chat) {
+      console.log("---- temp log ----");
+      console.log(APP_STATE.chats); // remove this
+      console.log("top"); // remove this
+    } else {
+      old_chat.remove();
+      Chat.createChat(chat.username, chat.pfp, chat.id, false);
+      console.log("---- temp log ----");
+      console.log(APP_STATE.chats) // remove this
+    }
   },
 
   loadChats: async () => {
@@ -670,21 +678,23 @@ const Chat = {
 
     const data = await response.json();
 
-    data.forEach((chat) => {
-      const chatId = `c${chat.id}`;
-      const otherUser =
-        APP_STATE.currentUser.username === chat.first_user_name
-          ? chat.second_user_name
-          : chat.first_user_name;
+    await Promise.all(
+      data.map(async (chat) => {
+        const chatId = `c${chat.id}`;
+        const otherUser =
+          APP_STATE.currentUser.username === chat.first_user_name
+            ? chat.second_user_name
+            : chat.first_user_name;
 
-      const pfpUrl = Utils.checkPfpExists(otherUser);
-      Chat.createChat(otherUser, pfpUrl, chat.id, true);
-      APP_STATE.renderedChats.add(chatId);
-    });
+        const pfpUrl = await Utils.checkPfpExists(otherUser);
+        Chat.createChat(otherUser, pfpUrl, chat.id, true);
+        APP_STATE.renderedChats.add(chatId);
+      })
+    );
   },
 
   createChat: (username, pfp, id, first_load) => {
-    // if (document.getElementById(`c${id}`)) return;
+    if (document.getElementById(`c${id}`)) return;
 
     const chatDiv = document.createElement("div");
     chatDiv.classList.add("chat");
@@ -707,20 +717,29 @@ const Chat = {
 
     chatDiv.appendChild(chatPhoto);
     chatDiv.appendChild(chatUsername);
-    
-    if (first_load) {
-      DOM_ELEMENTS.chatsContainer.appendChild(chatDiv);
-    } else {
-      DOM_ELEMENTS.chatsContainer.prepend(chatDiv);
-    }
 
-    let chat_array = {
+      let chat_array = {
       username: username,
       pfp: pfp,
       id: id,
     };
 
-    APP_STATE.chats.push(chat_array);
+
+    let existing_chat = APP_STATE.chats.find(chat_obj => chat_obj.id === id);
+
+    if (existing_chat) {
+      APP_STATE.chats = APP_STATE.chats.filter(chat_obj => chat_obj.id !== id);
+    }
+
+
+    
+    if (first_load) {
+      DOM_ELEMENTS.chatsContainer.appendChild(chatDiv);
+      APP_STATE.chats.push(chat_array);
+    } else {
+      DOM_ELEMENTS.chatsContainer.prepend(chatDiv);
+      APP_STATE.chats.unshift(chat_array);
+    }
 
     chatDiv.addEventListener("click", () => Chat.loadChat(id, username));
   },
