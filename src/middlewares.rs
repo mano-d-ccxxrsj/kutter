@@ -28,7 +28,8 @@ pub async fn create_user_table(pool: &PgPool) -> Result<(), sqlx::Error> {
             email VARCHAR(255) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
             verified BOOLEAN NOT NULL DEFAULT FALSE,
-            profile_picture TEXT UNIQUE
+            profile_picture TEXT UNIQUE,
+            biography VARCHAR(200)
         )",
     )
     .execute(pool)

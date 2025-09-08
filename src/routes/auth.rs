@@ -81,6 +81,7 @@ struct User {
     password: String,
     verified: bool,
     profile_picture: Option<String>,
+    biography: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -422,7 +423,8 @@ pub async fn verify_user(req: HttpRequest, pool: web::Data<PgPool>) -> impl Resp
                 "email": user.email,
                 "username": user.username,
                 "verified": user.verified,
-                "pfp_path": user.profile_picture
+                "pfp_path": user.profile_picture,
+                "biography": user.biography
             }
         })),
         _ => {
