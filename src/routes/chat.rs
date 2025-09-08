@@ -16,7 +16,6 @@ use tokio::{
 pub struct ChatMessage {
     pub id: Option<i32>,
     pub chat_id: Option<i32>,
-    pub email: String,
     pub username: String,
     pub message: String,
     pub replied_user: Option<String>,
@@ -62,6 +61,17 @@ pub struct DeleteMessageRequest {
     pub id: i32,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
+pub struct Bio {
+    pub username: String,
+    pub biography: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ChangeBio {
+    pub biography: Option<String>,
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(tag = "action", rename_all = "snake_case")]
 pub enum OutgoingMessage {
@@ -69,6 +79,7 @@ pub enum OutgoingMessage {
     EditMessage(ChatMessage),
     Delete { message_id: i32 },
     NewChat(Chat),
+    ChangeBio(Bio),
 }
 
 #[derive(Debug, Clone)]
@@ -222,6 +233,7 @@ pub async fn ws_handler(
     let mut _message_session = session;
 
     let broadcast_email = email.clone();
+    let broadcast_username = username.clone();
 
     actix_rt::spawn(async move {
         while let Some(Ok(msg)) = msg_stream.next().await {
@@ -456,6 +468,44 @@ pub async fn ws_handler(
                                     };
                                 }
                             }
+                            "change_bio" => {
+                                if let Ok(change_bio) =
+                                    serde_json::from_value::<ChangeBio>(ws_msg.payload)
+                                {
+                                    if let Some(biography) = change_bio.biography {
+                                        match sqlx::query(
+                                            "UPDATE users SET biography = $1 WHERE username = $2",
+                                        )
+                                        .bind(&biography)
+                                        .bind(&username)
+                                        .execute(&db_pool)
+                                        .await
+                                        {
+                                            Ok(_) => {
+                                                match sqlx::query_as::<_, Bio>(
+                                                    "SELECT * FROM users WHERE username = $1",
+                                                )
+                                                .bind(&username)
+                                                .fetch_one(&db_pool)
+                                                .await
+                                                {
+                                                    Ok(message) => {
+                                                        let _ = tx.send(
+                                                            OutgoingMessage::ChangeBio(message),
+                                                        );
+                                                    }
+                                                    Err(e) => {
+                                                        println!("error sending message: {}", e);
+                                                    }
+                                                }
+                                            }
+                                            Err(e) => {
+                                                println!("error updating biography: {}", e);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             "new_chat" => {
                                 if let Ok(new_chat) =
                                     serde_json::from_value::<NewChat>(ws_msg.payload)
@@ -527,7 +577,7 @@ pub async fn ws_handler(
                                     .fetch_optional(&db_pool)
                                     .await {
                                         Ok(Some(msg)) => {
-                                            if msg.email != email {
+                                            if msg.username != username {
                                                 let _error_response = serde_json::json!({
                                                     "status": "error",
                                                     "message": "You can only delete your own messages"
@@ -652,6 +702,13 @@ pub async fn ws_handler(
                                                 Err(_) => false
                                             }
                                         }
+                                    } else {
+                                        false
+                                    }
+                                }
+                                OutgoingMessage::ChangeBio(bio) => {
+                                    if bio.username == broadcast_username {
+                                        true
                                     } else {
                                         false
                                     }
@@ -793,7 +850,7 @@ pub async fn get_chat_messages(
     }
 
     match sqlx::query_as::<_, ChatMessage>(
-        "SELECT id, chat_id, email, username, message, replied_user, replied_message, time, edited FROM messages WHERE chat_id = $1 ORDER BY time ASC",
+        "SELECT id, chat_id, username, message, replied_user, replied_message, time, edited FROM messages WHERE chat_id = $1 ORDER BY time ASC",
     )
     .bind(chat_id)
     .fetch_all(&state.db_pool)
@@ -803,6 +860,37 @@ pub async fn get_chat_messages(
         Err(e) => {
             eprintln!("Error fetching chat messages: {}", e);
             return Ok(HttpResponse::InternalServerError().json("Error fetching chat messages"));
+        }
+    }
+}
+
+#[get("/users/{username}")]
+pub async fn get_user(
+    state: web::Data<Arc<AppState>>,
+    req: HttpRequest,
+    path: web::Path<String>,
+) -> Result<HttpResponse, Error> {
+    let token = match req.cookie("token") {
+        Some(token) => token.value().to_string(),
+        None => return Ok(HttpResponse::Unauthorized().finish()),
+    };
+
+    let _claims = match verify_token(token) {
+        Ok(claims) => claims,
+        Err(_) => return Ok(HttpResponse::Unauthorized().finish()),
+    };
+
+    let username = path.into_inner();
+
+    match sqlx::query_as::<_, Bio>("SELECT username, biography FROM users WHERE username = $1")
+        .bind(&username)
+        .fetch_all(&state.db_pool)
+        .await
+    {
+        Ok(info) => return Ok(HttpResponse::Ok().json(info)),
+        Err(e) => {
+            eprintln!("error fetching user informations: {}", e);
+            return Ok(HttpResponse::InternalServerError().json("error fetching user informations"));
         }
     }
 }

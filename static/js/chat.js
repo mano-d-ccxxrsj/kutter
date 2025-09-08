@@ -3,6 +3,7 @@ import { createSuccessAlert, createErrorAlert } from "./index.js";
 const DOM_ELEMENTS = {
   userInfoContainer: document.getElementById("userInfo"),
   modalBase: document.getElementById("modalBase"),
+  userDetails: document.getElementById("userDetails"),
   userConfigModal: document.getElementById("userConfigModal"),
   userConfigModalCloseButton: document.getElementById(
     "userConfigModalCloseButton",
@@ -11,6 +12,7 @@ const DOM_ELEMENTS = {
     "userConfigModalLogoutButton",
   ),
   modalPhotoConfig: document.getElementById("photoConfig"),
+  version: document.getElementById("version"),
   modalPersonalInfo: document.getElementById("personalInfo"),
   fileInput: document.getElementById("photo-upload"),
   uploadButton: document.getElementById("upload-button"),
@@ -44,6 +46,14 @@ const APP_STATE = {
   renderedChats: new Set(),
   renderedMessages: new Set(),
   chats: new Array(),
+  modalBase: {
+    Details: {
+      isActive: null,
+    },
+    userConfigModal: {
+      isActive: null,
+    },
+  },
   sockets: {
     friendReq: null,
     chat: null,
@@ -129,7 +139,7 @@ const User = {
     document.title = `Kutter - @${data.user.username}`;
 
     User.renderProfile(data.user);
-    User.setupModal(data.user);
+    User.setupModal(data.user, data.user.biography);
     User.manageTabs();
 
     return true;
@@ -191,6 +201,53 @@ const User = {
     });
   },
 
+  renderInfos: async (user) => {
+    if (!APP_STATE.modalBase.Details.isActive) {
+      DOM_ELEMENTS.modalBase.style.display = "flex";
+      DOM_ELEMENTS.userDetails.style.display = "flex";
+      APP_STATE.modalBase.Details.isActive = true;
+    }
+
+    const response = await fetch(`/users/${user}`);
+    if (!response.ok) return;
+
+    const data = await response.json();
+
+    const photoDiv = document.createElement("div");
+    photoDiv.classList.add("userIcon");
+    const photo = document.createElement("img");
+    photo.src = await Utils.checkPfpExists(data[0].username);
+    photoDiv.appendChild(photo);
+    DOM_ELEMENTS.userDetails.appendChild(photoDiv);
+
+    const username = document.createElement("p");
+    username.classList.add("username");
+    username.textContent = `@${data[0].username}`;
+    DOM_ELEMENTS.userDetails.appendChild(username);
+
+    const close_button = document.createElement("div");
+    close_button.classList.add("close-button");
+    close_button.id = "userDetailsCloseButton";
+    const close_button_icon = document.createElement("i");
+    close_button_icon.classList.add("bx", "bx-x");
+    close_button.appendChild(close_button_icon);
+    DOM_ELEMENTS.userDetails.appendChild(close_button);
+
+    if (data[0].biography) {
+      const biography = document.createElement("p");
+      biography.classList.add("biography");
+      biography.textContent = `${data[0].biography}`;
+      DOM_ELEMENTS.userDetails.appendChild(biography);
+    }
+
+    close_button.addEventListener("click", () => {
+      DOM_ELEMENTS.userDetails.innerHTML = "";
+      DOM_ELEMENTS.userDetails.style.display = "none";
+      DOM_ELEMENTS.modalBase.style.display = "none";
+      APP_STATE.modalBase.Details.isActive = false;
+    });
+  },
+
   renderProfile: (user) => {
     const photoDiv = document.createElement("div");
     photoDiv.classList.add("photo");
@@ -206,17 +263,39 @@ const User = {
 
     photoDiv.addEventListener("click", () => {
       DOM_ELEMENTS.modalBase.style.display = "flex";
+      DOM_ELEMENTS.userConfigModal.style.display = "flex";
     });
 
     const nameDiv = document.createElement("div");
     nameDiv.classList.add("name");
     nameDiv.textContent = `@${user.username}`;
     DOM_ELEMENTS.userInfoContainer.appendChild(nameDiv);
+    nameDiv.addEventListener("click", () => User.renderInfos(user.username));
   },
 
-  setupModal: (user) => {
+  changeBio: (biography) => {
+    const wsMessage = {
+      action: "change_bio",
+      payload: {
+        biography: biography,
+      },
+    };
+
+    APP_STATE.sockets.chat.send(JSON.stringify(wsMessage));
+  },
+
+  setupModal: (user, biography) => {
     DOM_ELEMENTS.userConfigModalCloseButton.addEventListener("click", () => {
       DOM_ELEMENTS.modalBase.style.display = "none";
+      DOM_ELEMENTS.userConfigModal.style.display = "none";
+    });
+
+    DOM_ELEMENTS.topbarUsername.addEventListener("click", () =>
+      User.renderInfos(APP_STATE.currentChatPartner),
+    );
+
+    DOM_ELEMENTS.version.addEventListener("click", () => {
+      window.location.href = "/changelog.html";
     });
 
     DOM_ELEMENTS.userConfigModalLogoutButton.addEventListener(
@@ -244,10 +323,39 @@ const User = {
     modalPhotoDiv.appendChild(modalPhotoElement);
     DOM_ELEMENTS.modalPhotoConfig.prepend(modalPhotoDiv);
 
-    const modalUsername = document.createElement("div");
+    const modalUsername = document.createElement("p");
     modalUsername.classList.add("name");
     modalUsername.textContent = `@${user.username}`;
     DOM_ELEMENTS.modalPersonalInfo.appendChild(modalUsername);
+
+    const modalBiography = document.createElement("p");
+    modalBiography.classList.add("biography-off");
+    if (biography) {
+      modalBiography.textContent = `${biography}`;
+    }
+    DOM_ELEMENTS.modalPersonalInfo.appendChild(modalBiography);
+
+    const buttons = document.createElement("div");
+    buttons.classList.add("buttons");
+
+    const submitProfile = document.createElement("button");
+    submitProfile.classList.add("submitProfile");
+    submitProfile.textContent = "Done";
+    submitProfile.addEventListener("click", () => {
+      User.changeBio(modalBiography.textContent);
+    });
+
+    const editProfile = document.createElement("button");
+    editProfile.classList.add("editProfile");
+    editProfile.textContent = "Edit biography";
+    editProfile.addEventListener("click", () => {
+      modalBiography.classList.remove("biography-off");
+      modalBiography.classList.add("biography-on");
+      modalBiography.contentEditable = true;
+      buttons.appendChild(submitProfile);
+    });
+    buttons.appendChild(editProfile);
+    DOM_ELEMENTS.modalPersonalInfo.appendChild(buttons);
 
     DOM_ELEMENTS.fileInput.addEventListener("change", () => {
       if (DOM_ELEMENTS.fileInput.files.length > 0) {
@@ -634,6 +742,8 @@ const Chat = {
                 messageInfo.appendChild(edit_warning);
               }
             }
+          } else if (data.action === "change_bio") {
+            createSuccessAlert("Biography changed successfully");
           }
         } catch (e) {
           console.error("Error parsing chat message", e);
@@ -655,7 +765,7 @@ const Chat = {
 
   reorderChats: (chat_id) => {
     const old_chat = document.getElementById(`c${chat_id}`);
-    const chat = APP_STATE.chats.find(chat_obj => chat_obj.id === chat_id);
+    const chat = APP_STATE.chats.find((chat_obj) => chat_obj.id === chat_id);
     if (APP_STATE.chats[0] !== chat) {
       old_chat.remove();
       Chat.createChat(chat.username, chat.pfp, chat.id, false);
@@ -710,19 +820,20 @@ const Chat = {
     chatDiv.appendChild(chatPhoto);
     chatDiv.appendChild(chatUsername);
 
-      let chat_array = {
+    let chat_array = {
       username: username,
       pfp: pfp,
       id: id,
     };
 
-
-    let existing_chat = APP_STATE.chats.find(chat_obj => chat_obj.id === id);
+    let existing_chat = APP_STATE.chats.find((chat_obj) => chat_obj.id === id);
 
     if (existing_chat) {
-      APP_STATE.chats = APP_STATE.chats.filter(chat_obj => chat_obj.id !== id);
+      APP_STATE.chats = APP_STATE.chats.filter(
+        (chat_obj) => chat_obj.id !== id,
+      );
     }
-    
+
     if (first_load) {
       DOM_ELEMENTS.chatsContainer.appendChild(chatDiv);
       APP_STATE.chats.push(chat_array);

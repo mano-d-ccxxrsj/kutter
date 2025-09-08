@@ -72,6 +72,7 @@ async fn main() -> std::io::Result<()> {
             .service(routes::chat::ws_handler)
             .service(routes::chat::get_chats)
             .service(routes::chat::get_chat_messages)
+            .service(routes::chat::get_user)
             .service(routes::friend::ws_handler)
             .service(routes::friend::get_friend_req)
             .service(routes::auth::upload_avatar)
