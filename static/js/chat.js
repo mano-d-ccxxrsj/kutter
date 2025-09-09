@@ -46,6 +46,7 @@ const APP_STATE = {
   renderedChats: new Set(),
   renderedMessages: new Set(),
   chats: new Array(),
+  editing: null,
   modalBase: {
     Details: {
       isActive: null,
@@ -338,24 +339,41 @@ const User = {
     const buttons = document.createElement("div");
     buttons.classList.add("buttons");
 
-    const submitProfile = document.createElement("button");
-    submitProfile.classList.add("submitProfile");
-    submitProfile.textContent = "Done";
-    submitProfile.addEventListener("click", () => {
-      User.changeBio(modalBiography.textContent);
-    });
-
     const editProfile = document.createElement("button");
     editProfile.classList.add("editProfile");
     editProfile.textContent = "Edit biography";
     editProfile.addEventListener("click", () => {
-      modalBiography.classList.remove("biography-off");
-      modalBiography.classList.add("biography-on");
-      modalBiography.contentEditable = true;
-      buttons.appendChild(submitProfile);
+      if (!APP_STATE.editing) {
+        APP_STATE.editing = true;
+        modalBiography.classList.remove("biography-off");
+        modalBiography.classList.add("biography-on");
+        modalBiography.contentEditable = "true";
+        editProfile.textContent = "Cancel";
+        buttons.appendChild(submitProfile);
+      } else {
+        APP_STATE.editing = false;
+        submitProfile.remove();
+        editProfile.textContent = "Edit biography";
+        modalBiography.contentEditable = "false";
+        modalBiography.classList.remove("biography-on");
+        modalBiography.classList.add("biography-off");
+      }
     });
     buttons.appendChild(editProfile);
     DOM_ELEMENTS.modalPersonalInfo.appendChild(buttons);
+
+    const submitProfile = document.createElement("button");
+    submitProfile.classList.add("submitProfile");
+    submitProfile.textContent = "Done";
+    submitProfile.addEventListener("click", () => {
+      APP_STATE.editing = false;
+      submitProfile.remove();
+      User.changeBio(modalBiography.textContent);
+      editProfile.textContent = "Edit biography";
+      modalBiography.contentEditable = "false";
+      modalBiography.classList.remove("biography-on");
+      modalBiography.classList.add("biography-off");
+    });
 
     DOM_ELEMENTS.fileInput.addEventListener("change", () => {
       if (DOM_ELEMENTS.fileInput.files.length > 0) {
