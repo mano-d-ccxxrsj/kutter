@@ -498,24 +498,29 @@ nav {
                 flex-direction: column;
                 align-items: flex-start;
                 padding: 1em;
+                gap: 1em;
 
                 & .name {
                     font-weight: bold;
                     font-size: 2em;
+                    margin: 0;
                 }
 
                 & .biography-off {
-                    font-size: 0.8em;
+                    font-size: 1em;
                     max-width: 20em;
                     word-break: break-all;
                     word-wrap: break-word;
+                    margin: 0;
                 }
 
                 & .biography-on {
+                    font-size: 1em;
                     background-color: variables.$bg;
                     color: variables.$border;
                     border: 1px solid variables.$border;
                     outline: none;
+                    padding: 0.5em;
                     max-width: 20em;
                     align-items: center;
                     overflow-wrap: break-word;
