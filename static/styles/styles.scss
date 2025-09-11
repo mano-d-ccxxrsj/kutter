@@ -303,7 +303,7 @@ nav {
         & .biography {
             margin: 0px 1em 0px 1em;
             word-wrap: break-word;
-            word-break: break-all;
+            word-break: break-word;
         }
     }
 
@@ -509,7 +509,7 @@ nav {
                 & .biography-off {
                     font-size: 1em;
                     max-width: 20em;
-                    word-break: break-all;
+                    word-break: break-word;
                     word-wrap: break-word;
                     margin: 0;
                 }
@@ -599,7 +599,7 @@ nav {
             position: relative;
             flex-direction: column;
             overflow-wrap: break-word;
-            word-break: break-all;
+            word-break: break-word;
 
             & .options {
                 position: absolute;
@@ -1354,7 +1354,7 @@ nav {
             & .biography {
                 margin: 0px 1em 0px 1em;
                 word-wrap: break-word;
-                word-break: break-all;
+                word-break: break-word;
             }
         }
 
@@ -1536,7 +1536,7 @@ nav {
                     & .biography-off {
                         font-size: 1em;
                         max-width: 20em;
-                        word-break: break-all;
+                        word-break: break-word;
                         word-wrap: break-word;
                         margin: 0;
                     }
@@ -1627,7 +1627,7 @@ nav {
                 position: relative;
                 flex-direction: column;
                 overflow-wrap: break-word;
-                word-break: break-all;
+                word-break: break-word;
 
                 & .options {
                     position: absolute;

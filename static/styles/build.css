@@ -297,7 +297,7 @@ nav .nav-buttons .theme-button:hover {
 .opacity .userDetails .biography {
   margin: 0px 1em 0px 1em;
   word-wrap: break-word;
-  word-break: break-all;
+  word-break: break-word;
 }
 .opacity .modalWarning {
   position: fixed;
@@ -480,7 +480,7 @@ nav .nav-buttons .theme-button:hover {
 .opacity .userConfigModal .modalUserInfo .personalInfo .biography-off {
   font-size: 1em;
   max-width: 20em;
-  word-break: break-all;
+  word-break: break-word;
   word-wrap: break-word;
   margin: 0;
 }
@@ -559,7 +559,7 @@ nav .nav-buttons .theme-button:hover {
   position: relative;
   flex-direction: column;
   overflow-wrap: break-word;
-  word-break: break-all;
+  word-break: break-word;
 }
 .center_wrapper .chat_container .message_container .options {
   position: absolute;
@@ -1220,7 +1220,7 @@ nav .nav-buttons .theme-button:hover {
   .opacity .userDetails .biography {
     margin: 0px 1em 0px 1em;
     word-wrap: break-word;
-    word-break: break-all;
+    word-break: break-word;
   }
   .opacity .modalWarning {
     position: fixed;
@@ -1383,7 +1383,7 @@ nav .nav-buttons .theme-button:hover {
   .opacity .userConfigModal .modalUserInfo .personalInfo .biography-off {
     font-size: 1em;
     max-width: 20em;
-    word-break: break-all;
+    word-break: break-word;
     word-wrap: break-word;
     margin: 0;
   }
@@ -1462,7 +1462,7 @@ nav .nav-buttons .theme-button:hover {
     position: relative;
     flex-direction: column;
     overflow-wrap: break-word;
-    word-break: break-all;
+    word-break: break-word;
   }
   .center_wrapper .chat_container .message_container .options {
     position: absolute;
