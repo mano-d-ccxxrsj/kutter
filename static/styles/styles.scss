@@ -667,6 +667,11 @@ nav {
                     & .username {
                         font-weight: 900;
                         margin: 0;
+                        cursor: pointer;
+
+                        &:hover {
+                            text-decoration: underline;
+                        }
                     }
 
                     & p {
@@ -731,6 +736,11 @@ nav {
                         & .username {
                             margin: 0;
                             font-weight: bold;
+                            cursor: pointer;
+
+                            &:hover {
+                                text-decoration: underline;
+                            }
                         }
 
                         & .timestamp {
@@ -1695,6 +1705,11 @@ nav {
                         & .username {
                             font-weight: 900;
                             margin: 0;
+                            cursor: pointer;
+
+                            &:hover {
+                                text-decoration: underline;
+                            }
                         }
 
                         & p {
@@ -1753,6 +1768,11 @@ nav {
 
                             & .username {
                                 font-weight: bold;
+                                cursor: pointer;
+
+                                &:hover {
+                                    text-decoration: underline;
+                                }
                             }
 
                             & .timestamp {
