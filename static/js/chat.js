@@ -136,6 +136,10 @@ const User = {
       return false;
     }
 
+    document.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+    });
+
     APP_STATE.currentUser = data.user;
     document.title = `Kutter - @${data.user.username}`;
 
@@ -985,6 +989,9 @@ const Chat = {
       const reply_user = document.createElement("p");
       reply_user.textContent = `@${fetch_replied_user}:`;
       reply_user.classList.add("username");
+      reply_user.addEventListener("click", () =>
+        User.renderInfos(fetch_replied_user),
+      );
       const reply_message = document.createElement("p");
       const photo = document.createElement("div");
       photo.classList.add("photo");
@@ -1134,6 +1141,7 @@ const Chat = {
     const messageUsername = document.createElement("p");
     messageUsername.classList.add("username");
     messageUsername.textContent = `@${username}`;
+    messageUsername.addEventListener("click", () => User.renderInfos(username));
     const messageTimestamp = document.createElement("p");
     messageTimestamp.classList.add("timestamp");
     messageTimestamp.textContent = Utils.formatTimestamp(timestamp);

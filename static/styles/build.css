@@ -621,6 +621,10 @@ nav .nav-buttons .theme-button:hover {
 .center_wrapper .chat_container .message_container .top .replied_container .username {
   font-weight: 900;
   margin: 0;
+  cursor: pointer;
+}
+.center_wrapper .chat_container .message_container .top .replied_container .username:hover {
+  text-decoration: underline;
 }
 .center_wrapper .chat_container .message_container .top .replied_container p {
   margin: 0;
@@ -676,6 +680,10 @@ nav .nav-buttons .theme-button:hover {
 .center_wrapper .chat_container .message_container .bottom .right_side .message_info .username {
   margin: 0;
   font-weight: bold;
+  cursor: pointer;
+}
+.center_wrapper .chat_container .message_container .bottom .right_side .message_info .username:hover {
+  text-decoration: underline;
 }
 .center_wrapper .chat_container .message_container .bottom .right_side .message_info .timestamp {
   margin: 0;
@@ -1524,6 +1532,10 @@ nav .nav-buttons .theme-button:hover {
   .center_wrapper .chat_container .message_container .top .replied_container .username {
     font-weight: 900;
     margin: 0;
+    cursor: pointer;
+  }
+  .center_wrapper .chat_container .message_container .top .replied_container .username:hover {
+    text-decoration: underline;
   }
   .center_wrapper .chat_container .message_container .top .replied_container p {
     margin: 0;
@@ -1574,6 +1586,10 @@ nav .nav-buttons .theme-button:hover {
   }
   .center_wrapper .chat_container .message_container .bottom .right_side .message_info .username {
     font-weight: bold;
+    cursor: pointer;
+  }
+  .center_wrapper .chat_container .message_container .bottom .right_side .message_info .username:hover {
+    text-decoration: underline;
   }
   .center_wrapper .chat_container .message_container .bottom .right_side .message_info .timestamp {
     font-size: 12px;
