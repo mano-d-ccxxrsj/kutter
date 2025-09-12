@@ -304,6 +304,7 @@ nav {
             margin: 0px 1em 0px 1em;
             word-wrap: break-word;
             word-break: break-word;
+            white-space: pre-line;
         }
     }
 
@@ -511,6 +512,7 @@ nav {
                     max-width: 20em;
                     word-break: break-word;
                     word-wrap: break-word;
+                    white-space: pre-line;
                     margin: 0;
                 }
 
@@ -724,6 +726,7 @@ nav {
 
                         & .message {
                             margin: 0;
+                            white-space: pre-line;
                         }
                     }
 
@@ -1548,6 +1551,7 @@ nav {
                         max-width: 20em;
                         word-break: break-word;
                         word-wrap: break-word;
+                        white-space: pre-line;
                         margin: 0;
                     }
 
