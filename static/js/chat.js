@@ -47,6 +47,7 @@ const APP_STATE = {
   renderedMessages: new Set(),
   chats: new Array(),
   editing: null,
+  isMobile: null,
   modalBase: {
     Details: {
       isActive: null,
@@ -62,6 +63,71 @@ const APP_STATE = {
 };
 
 const Utils = {
+  gestures: () => {
+    if (navigator.maxTouchPoints > 0) {
+      APP_STATE.isMobile = true;
+      DOM_ELEMENTS.left_side_wrapper.style.display = "flex";
+    } else {
+      APP_STATE.isMobile = false;
+    }
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+    const threshold = 200;
+
+    APP_STATE.currentTab = 0;
+
+    const handleStart = (clientX) => {
+      startX = clientX;
+      isDragging = true;
+    };
+
+    const handleMove = (clientX) => {
+      if (!isDragging) return;
+      currentX = clientX;
+    };
+
+    const handleEnd = () => {
+      if (!isDragging) return;
+
+      const deltaX = currentX - startX;
+
+      if (Math.abs(deltaX) > threshold) {
+        if (deltaX > 0) {
+          if (APP_STATE.currentTab === 2) {
+            DOM_ELEMENTS.right_side_wrapper.style.display = "none";
+            APP_STATE.currentTab = 0;
+          } else if (APP_STATE.currentTab === 0) {
+            DOM_ELEMENTS.left_side_wrapper.style.display = "flex";
+            DOM_ELEMENTS.right_side_wrapper.style.display = "none";
+            APP_STATE.currentTab = 1;
+          }
+        } else {
+          if (APP_STATE.currentTab === 1) {
+            DOM_ELEMENTS.left_side_wrapper.style.display = "none";
+            APP_STATE.currentTab = 0;
+          } else if (APP_STATE.currentTab === 0) {
+            DOM_ELEMENTS.right_side_wrapper.style.display = "flex";
+            DOM_ELEMENTS.left_side_wrapper.style.display = "none";
+            APP_STATE.currentTab = 2;
+          }
+        }
+      }
+
+      isDragging = false;
+    };
+
+    document.addEventListener("touchstart", (e) => {
+      handleStart(e.touches[0].clientX);
+    });
+
+    document.addEventListener("touchmove", (e) => {
+      handleMove(e.touches[0].clientX);
+    });
+
+    document.addEventListener("touchend", handleEnd);
+  },
+
   clearAppState: () => {
     if (APP_STATE.currentReply !== null) {
       const reply = document.getElementById(`reply_${APP_STATE.currentReply}`);
@@ -145,65 +211,7 @@ const User = {
 
     User.renderProfile(data.user);
     User.setupModal(data.user, data.user.biography);
-    User.manageTabs();
-
     return true;
-  },
-
-  manageTabs: () => {
-    DOM_ELEMENTS.chatsButton.addEventListener("click", () => {
-      switch (APP_STATE.currentTab) {
-        case 1:
-          DOM_ELEMENTS.left_side_wrapper.style.display = "none";
-          APP_STATE.currentTab = 0;
-          break;
-        case 0:
-          DOM_ELEMENTS.left_side_wrapper.style.display = "flex";
-          APP_STATE.currentTab = 1;
-          break;
-        case 2:
-          DOM_ELEMENTS.left_side_wrapper.style.display = "flex";
-          DOM_ELEMENTS.right_side_wrapper.style.display = "none";
-          APP_STATE.currentTab = 1;
-          break;
-        case null:
-          DOM_ELEMENTS.left_side_wrapper.style.display = "flex";
-          APP_STATE.currentTab = 1;
-          break;
-      }
-    });
-
-    DOM_ELEMENTS.left_side_wrapper.addEventListener("blur", () => {
-      DOM_ELEMENTS.left_side_wrapper.style.display = "none";
-      APP_STATE.currentTab = 0;
-    });
-
-    DOM_ELEMENTS.right_side_wrapper.addEventListener("blur", () => {
-      DOM_ELEMENTS.right_side_wrapper.style.display = "none";
-      APP_STATE.currentTab = 0;
-    });
-
-    DOM_ELEMENTS.friendsButton.addEventListener("click", () => {
-      switch (APP_STATE.currentTab) {
-        case 1:
-          DOM_ELEMENTS.right_side_wrapper.style.display = "flex";
-          DOM_ELEMENTS.left_side_wrapper.style.display = "none";
-          APP_STATE.currentTab = 2;
-          break;
-        case 0:
-          DOM_ELEMENTS.right_side_wrapper.style.display = "flex";
-          APP_STATE.currentTab = 2;
-          break;
-        case 2:
-          DOM_ELEMENTS.right_side_wrapper.style.display = "none";
-          APP_STATE.currentTab = 0;
-          break;
-        case null:
-          DOM_ELEMENTS.right_side_wrapper.style.display = "flex";
-          APP_STATE.currentTab = 2;
-          break;
-      }
-    });
   },
 
   renderInfos: async (user) => {
@@ -868,6 +876,11 @@ const Chat = {
   },
 
   loadChat: async (chatId, username) => {
+    if (APP_STATE.isMobile === true) {
+      APP_STATE.currentTab = 0;
+      DOM_ELEMENTS.left_side_wrapper.style.display = "none";
+    }
+
     if (chatId === APP_STATE.currentChatId) return;
 
     DOM_ELEMENTS.chatContainer.innerHTML = "";
@@ -1188,6 +1201,7 @@ const initApp = async () => {
 
   await Friends.init();
   await Chat.init();
+  Utils.gestures();
 };
 
 window.addEventListener("beforeunload", () => {
