@@ -1788,13 +1788,13 @@ nav {
             }
         }
 
-        & .replied_message_container {
+        & .changed_message_container {
             position: fixed;
             bottom: 0;
             right: 0;
             left: 0;
-            margin-left: 0;
-            margin-right: 0;
+            margin-left: 0px;
+            margin-right: 0px;
             margin-bottom: 84px;
             min-height: 50px;
             background-color: variables.$bg;
@@ -1810,6 +1810,18 @@ nav {
                 gap: 1em;
 
                 & .replied_user {
+                    color: variables.$text;
+                    font-weight: 900;
+                }
+            }
+
+            & .edit {
+                margin-left: 1em;
+                display: flex;
+                align-items: center;
+                gap: 1em;
+
+                & .edit_warning {
                     color: variables.$text;
                     font-weight: 900;
                 }
