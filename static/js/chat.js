@@ -1,4 +1,5 @@
 import { createSuccessAlert, createErrorAlert } from "./index.js";
+import "https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js";
 
 const DOM_ELEMENTS = {
   userInfoContainer: document.getElementById("userInfo"),
@@ -70,62 +71,54 @@ const Utils = {
     } else {
       APP_STATE.isMobile = false;
     }
-    let startX = 0;
-    let currentX = 0;
-    let isDragging = false;
-    const threshold = 200;
 
-    APP_STATE.currentTab = 0;
+    APP_STATE.currentTab = 1;
 
-    const handleStart = (clientX) => {
-      startX = clientX;
-      isDragging = true;
-    };
-
-    const handleMove = (clientX) => {
-      if (!isDragging) return;
-      currentX = clientX;
-    };
-
-    const handleEnd = () => {
-      if (!isDragging) return;
-
-      const deltaX = currentX - startX;
-
-      if (Math.abs(deltaX) > threshold) {
-        if (deltaX > 0) {
-          if (APP_STATE.currentTab === 2) {
-            DOM_ELEMENTS.right_side_wrapper.style.display = "none";
-            APP_STATE.currentTab = 0;
-          } else if (APP_STATE.currentTab === 0) {
+    function swiper(dir) {
+      if (dir === 4) {
+        switch (APP_STATE.currentTab) {
+          case 0:
             DOM_ELEMENTS.left_side_wrapper.style.display = "flex";
-            DOM_ELEMENTS.right_side_wrapper.style.display = "none";
             APP_STATE.currentTab = 1;
-          }
-        } else {
-          if (APP_STATE.currentTab === 1) {
+            break;
+          case 2:
+            DOM_ELEMENTS.right_side_wrapper.style.display = "none";
+            APP_STATE.currentTab = 0;
+            break;
+          default:
+            break;
+        }
+      } else if (dir === 2) {
+        switch (APP_STATE.currentTab) {
+          case 0:
+            DOM_ELEMENTS.right_side_wrapper.style.display = "flex";
+            APP_STATE.currentTab = 2;
+            break;
+          case 1:
             DOM_ELEMENTS.left_side_wrapper.style.display = "none";
             APP_STATE.currentTab = 0;
-          } else if (APP_STATE.currentTab === 0) {
-            DOM_ELEMENTS.right_side_wrapper.style.display = "flex";
-            DOM_ELEMENTS.left_side_wrapper.style.display = "none";
-            APP_STATE.currentTab = 2;
-          }
+            break;
+          default:
+            break;
         }
       }
+    }
 
-      isDragging = false;
-    };
+    if (APP_STATE.isMobile) {
+      const right_side_wrapper = new Hammer(DOM_ELEMENTS.right_side_wrapper);
+      const left_side_wrapper = new Hammer(DOM_ELEMENTS.left_side_wrapper);
+      const chatContainer = new Hammer(DOM_ELEMENTS.chatContainer);
 
-    document.addEventListener("touchstart", (e) => {
-      handleStart(e.touches[0].clientX);
-    });
-
-    document.addEventListener("touchmove", (e) => {
-      handleMove(e.touches[0].clientX);
-    });
-
-    document.addEventListener("touchend", handleEnd);
+      chatContainer.on("swipe", function (event) {
+        swiper(event.direction);
+      });
+      left_side_wrapper.on("swipe", function (event) {
+        swiper(event.direction);
+      });
+      right_side_wrapper.on("swipe", function (event) {
+        swiper(event.direction);
+      });
+    }
   },
 
   clearAppState: () => {

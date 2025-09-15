@@ -37,6 +37,10 @@
   background: var(--hover);
 }
 
+* {
+  touch-action: pan-y;
+}
+
 body {
   font-family: "Roboto Mono", monospace;
   background-color: var(--bg);
