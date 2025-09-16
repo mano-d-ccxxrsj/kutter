@@ -2,6 +2,7 @@ import { createSuccessAlert, createErrorAlert } from "./index.js";
 import "https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js";
 
 const DOM_ELEMENTS = {
+  settingsButton: document.getElementById("settingsButton"),
   userInfoContainer: document.getElementById("userInfo"),
   modalBase: document.getElementById("modalBase"),
   userDetails: document.getElementById("userDetails"),
@@ -53,7 +54,7 @@ const APP_STATE = {
     Details: {
       isActive: null,
     },
-    userConfigModal: {
+    settingsModal: {
       isActive: null,
     },
   },
@@ -109,13 +110,13 @@ const Utils = {
       const left_side_wrapper = new Hammer(DOM_ELEMENTS.left_side_wrapper);
       const chatContainer = new Hammer(DOM_ELEMENTS.chatContainer);
 
-      chatContainer.on("swipe", function (event) {
+      chatContainer.on("swipe", function(event) {
         swiper(event.direction);
       });
-      left_side_wrapper.on("swipe", function (event) {
+      left_side_wrapper.on("swipe", function(event) {
         swiper(event.direction);
       });
-      right_side_wrapper.on("swipe", function (event) {
+      right_side_wrapper.on("swipe", function(event) {
         swiper(event.direction);
       });
     }
@@ -195,7 +196,7 @@ const User = {
       return false;
     }
 
-    document.addEventListener("contextmenu", function (e) {
+    document.addEventListener("contextmenu", function(e) {
       e.preventDefault();
     });
 
@@ -265,9 +266,12 @@ const User = {
     };
     photoElement.alt = `${user.username.charAt(0)}`;
     photoDiv.appendChild(photoElement);
-    DOM_ELEMENTS.userInfoContainer.appendChild(photoDiv);
 
     photoDiv.addEventListener("click", () => {
+      User.renderInfos(user.username);
+    })
+
+    DOM_ELEMENTS.settingsButton.addEventListener("click", () => {
       DOM_ELEMENTS.modalBase.style.display = "flex";
       DOM_ELEMENTS.userConfigModal.style.display = "flex";
     });
@@ -275,7 +279,12 @@ const User = {
     const nameDiv = document.createElement("div");
     nameDiv.classList.add("name");
     nameDiv.textContent = `@${user.username}`;
-    DOM_ELEMENTS.userInfoContainer.appendChild(nameDiv);
+
+    const infoDiv = document.createElement("div");
+    infoDiv.classList.add("infoDiv")
+    infoDiv.appendChild(photoDiv);
+    infoDiv.appendChild(nameDiv)
+    DOM_ELEMENTS.userInfoContainer.prepend(infoDiv);
     nameDiv.addEventListener("click", () => User.renderInfos(user.username));
   },
 

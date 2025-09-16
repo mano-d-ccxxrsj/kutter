@@ -3,909 +3,697 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
 
 ::-webkit-scrollbar {
-    width: 14px;
-    height: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: variables.$border;
+  background: variables.$border;
 
-    &:hover {
-        background: variables.$hover;
-    }
+  &:hover {
+    background: variables.$hover;
+  }
 }
 
 * {
-    touch-action: pan-y;
+  touch-action: pan-y;
 }
 
 body {
-    font-family: "Roboto Mono", monospace;
-    background-color: variables.$bg;
-    color: variables.$text;
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    user-select: none;
+  font-family: "Roboto Mono", monospace;
+  background-color: variables.$bg;
+  color: variables.$text;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  user-select: none;
 }
 
 a {
-    text-decoration: none;
-    color: variables.$text;
-    height: 100%;
-    width: 100%;
+  text-decoration: none;
+  color: variables.$text;
+  height: 100%;
+  width: 100%;
 }
 
 span {
-    color: variables.$accent;
+  color: variables.$accent;
 }
 
 nav {
-    background-color: variables.$bg;
-    color: variables.$text;
-    border-bottom: 1px solid variables.$border;
+  background-color: variables.$bg;
+  color: variables.$text;
+  border-bottom: 1px solid variables.$border;
+  display: flex;
+  align-items: s;
+  justify-content: space-evenly;
+  height: 4em;
+
+  & .logo {
+    cursor: default;
+  }
+
+  & .nav-buttons {
     display: flex;
-    align-items: s;
-    justify-content: space-evenly;
-    height: 4em;
+    align-items: center;
+    height: 100%;
 
-    & .logo {
-        cursor: default;
+    & button {
+      background-color: variables.$bg;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: variables.$text;
+      padding: 1em;
+      border: none;
+      cursor: pointer;
+      height: 100%;
+      font-size: 1.2em;
+      min-width: 3em;
+
+      &:hover {
+        background-color: variables.$hover;
+      }
     }
 
-    & .nav-buttons {
-        display: flex;
-        align-items: center;
-        height: 100%;
+    .theme-button {
+      background-color: variables.$accent;
 
-        & button {
-            background-color: variables.$bg;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: variables.$text;
-            padding: 1em;
-            border: none;
-            cursor: pointer;
-            height: 100%;
-            font-size: 1.2em;
-            min-width: 3em;
+      & i {
+        font-size: 1em;
+      }
 
-            &:hover {
-                background-color: variables.$hover;
-            }
-        }
-
-        .theme-button {
-            background-color: variables.$accent;
-
-            & i {
-                font-size: 1em;
-            }
-
-            &:hover {
-                background-color: variables.$hover-accent;
-            }
-        }
+      &:hover {
+        background-color: variables.$hover-accent;
+      }
     }
+  }
 }
 
 .hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1em;
+  height: 90dvh;
+  background-color: variables.$bg;
+  color: variables.$text;
+
+  & .text {
+    text-align: center;
+    max-width: 600px;
+
+    & h1 {
+      font-size: 2.5em;
+      margin-bottom: 1em;
+    }
+
+    & p {
+      font-size: 1em;
+      line-height: 1.6;
+    }
+  }
+
+  & .buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1em;
+
+    & button {
+      background-color: variables.$accent;
+      border: none;
+      color: variables.$text;
+      padding: 1em;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: bold;
+
+      &:hover {
+        background-color: variables.$hover-accent;
+      }
+    }
+  }
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background-color: variables.$bg;
+  height: 90vh;
+  width: 100%;
+
+  & .form-inputs {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     gap: 1em;
-    height: 90dvh;
-    background-color: variables.$bg;
-    color: variables.$text;
+    border: 1px solid variables.$border;
+    padding: 2.5em;
+    width: 12em;
 
-    & .text {
-        text-align: center;
-        max-width: 600px;
+    & input {
+      border: 1px solid variables.$border;
+      padding: 0.5em;
+      background-color: variables.$bg;
+      font-size: 1em;
+      color: variables.$text;
+      width: 100%;
+      outline: none;
 
-        & h1 {
-            font-size: 2.5em;
-            margin-bottom: 1em;
-        }
-
-        & p {
-            font-size: 1em;
-            line-height: 1.6;
-        }
+      &:focus {
+        background-color: variables.$hover;
+      }
     }
+  }
 
-    & .buttons {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1em;
-
-        & button {
-            background-color: variables.$accent;
-            border: none;
-            color: variables.$text;
-            padding: 1em;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-
-            &:hover {
-                background-color: variables.$hover-accent;
-            }
-        }
-    }
-}
-
-.form {
+  & .form-buttons {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    background-color: variables.$bg;
-    height: 90vh;
-    width: 100%;
+    gap: 1em;
+    border: 1px solid variables.$border;
+    padding: 2.5em;
+    width: 12em;
 
-    & .form-inputs {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 1em;
-        border: 1px solid variables.$border;
-        padding: 2.5em;
-        width: 12em;
+    & button {
+      border: 1px solid variables.$border;
+      padding: 0.5em;
+      background-color: variables.$bg;
+      font-size: 1em;
+      color: variables.$text;
+      cursor: pointer;
+      width: 100%;
 
-        & input {
-            border: 1px solid variables.$border;
-            padding: 0.5em;
-            background-color: variables.$bg;
-            font-size: 1em;
-            color: variables.$text;
-            width: 100%;
-            outline: none;
-
-            &:focus {
-                background-color: variables.$hover;
-            }
-        }
+      &:hover {
+        background-color: variables.$hover;
+      }
     }
 
-    & .form-buttons {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 1em;
-        border: 1px solid variables.$border;
-        padding: 2.5em;
-        width: 12em;
+    & .sign-button {
+      padding: 0.5em;
+      background-color: variables.$accent;
+      font-size: 1em;
+      color: variables.$text;
+      width: 100%;
 
-        & button {
-            border: 1px solid variables.$border;
-            padding: 0.5em;
-            background-color: variables.$bg;
-            font-size: 1em;
-            color: variables.$text;
-            cursor: pointer;
-            width: 100%;
-
-            &:hover {
-                background-color: variables.$hover;
-            }
-        }
-
-        & .sign-button {
-            padding: 0.5em;
-            background-color: variables.$accent;
-            font-size: 1em;
-            color: variables.$text;
-            width: 100%;
-
-            &:hover {
-                background-color: variables.$hover-accent;
-            }
-        }
+      &:hover {
+        background-color: variables.$hover-accent;
+      }
     }
+  }
 }
 
 .mobile_buttons {
-    position: fixed;
-    top: 0em;
-    right: 0em;
-    left: 0em;
-    padding: 0;
-    margin: 0;
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    display: none;
+  position: fixed;
+  top: 0em;
+  right: 0em;
+  left: 0em;
+  padding: 0;
+  margin: 0;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  display: none;
 
-    & button {
-        background-color: variables.$bg;
-        border: none;
-        color: variables.$text;
-        text-decoration: underline;
-    }
+  & button {
+    background-color: variables.$bg;
+    border: none;
+    color: variables.$text;
+    text-decoration: underline;
+  }
 }
 
 .opacity {
-    position: fixed;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+
+  & .userDetails {
     z-index: 100;
+    position: fixed;
+    background-color: variables.$bg;
+    width: 30%;
+    height: 70%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border: 1px solid variables.$border;
 
-    & .userDetails {
-        z-index: 100;
-        position: fixed;
-        background-color: variables.$bg;
-        width: 30%;
-        height: 70%;
-        display: none;
-        justify-content: center;
+    & .close-button {
+      position: absolute;
+      top: 0.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      right: 0.5em;
+      cursor: pointer;
+      font-size: 1.5em;
+      color: variables.$text;
+      background-color: variables.$bg;
+      border: 1px solid variables.$border;
+      padding: 0;
+      margin: 0;
+      z-index: 101;
+
+      &:hover {
+        background-color: variables.$hover;
+      }
+
+      & i {
+        padding: 0.2em;
+      }
+    }
+
+    & .userIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      height: 14em;
+      width: 14em;
+      border-radius: 50%;
+
+      & img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        display: flex;
         align-items: center;
-        flex-direction: column;
-        border: 1px solid variables.$border;
+        justify-content: center;
+        text-align: center;
+      }
+    }
 
-        & .close-button {
-            position: absolute;
-            top: 0.5em;
+    & .username {
+      margin: 0;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    & .biography {
+      margin: 0px 1em 0px 1em;
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: pre-line;
+    }
+  }
+
+  & .modalWarning {
+    position: fixed;
+    z-index: 100;
+    height: 80%;
+    padding: 2em;
+    background-color: variables.$bg;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+    & .span {
+      font-weight: bolder;
+      font-size: 30px;
+    }
+  }
+
+  & .userConfigModal {
+    position: fixed;
+    z-index: 100;
+    height: 80%;
+    padding: 2em;
+    max-width: 60%;
+    background-color: variables.$bg;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid variables.$border;
+
+    & .logout-button {
+      position: absolute;
+      top: 0.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      right: 2.5em;
+      cursor: pointer;
+      font-size: 1.5em;
+      color: variables.$text;
+      background-color: variables.$bg;
+      border: 1px solid variables.$border;
+      padding: 0;
+      margin: 0;
+      z-index: 101;
+
+      &:hover {
+        background-color: variables.$hover;
+      }
+
+      & i {
+        padding: 0.2em;
+      }
+    }
+
+    & .close-button {
+      position: absolute;
+      top: 0.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      right: 0.5em;
+      cursor: pointer;
+      font-size: 1.5em;
+      color: variables.$text;
+      background-color: variables.$bg;
+      border: 1px solid variables.$border;
+      padding: 0;
+      margin: 0;
+      z-index: 101;
+
+      &:hover {
+        background-color: variables.$hover;
+      }
+
+      & i {
+        padding: 0.2em;
+      }
+    }
+
+    & .version {
+      position: absolute;
+      bottom: 0.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      left: 0.5em;
+      color: variables.$border;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      z-index: 101;
+      text-decoration: underline;
+
+      &:hover {
+        color: variables.$text;
+      }
+    }
+
+    & .modalUserInfo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4em;
+
+      & .photoConfigs {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 1em;
+
+        & .modalPhoto {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          height: 18em;
+          width: 18em;
+          border-radius: 50%;
+
+          & img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
             display: flex;
             align-items: center;
             justify-content: center;
-            right: 0.5em;
-            cursor: pointer;
-            font-size: 1.5em;
-            color: variables.$text;
-            background-color: variables.$bg;
-            border: 1px solid variables.$border;
-            padding: 0;
-            margin: 0;
-            z-index: 101;
-
-            &:hover {
-                background-color: variables.$hover;
-            }
-
-            & i {
-                padding: 0.2em;
-            }
+            text-align: center;
+          }
         }
 
-        & .userIcon {
+        & input[type="file"] {
+          display: none;
+        }
+
+        & .buttons {
+          display: flex;
+          width: 100%;
+          gap: 1em;
+
+          & label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+          }
+
+          & .label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: variables.$bg;
+            color: variables.$text;
+            border: 1px solid variables.$border;
+            width: 50%;
+            height: 4em;
+            margin: 0;
+            padding: 0;
+
+            &:hover {
+              background-color: variables.$hover;
+            }
+          }
+
+          & button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: variables.$accent;
+            color: variables.$text;
+            border: none;
+            padding: 0.5em;
+            width: 50%;
+            height: 4em;
+            cursor: pointer;
+            font-size: 1em;
+
+            &:hover {
+              background-color: variables.$hover-accent;
+            }
+          }
+        }
+      }
+
+      & .personalInfo {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1em;
+        gap: 1em;
+
+        & .name {
+          font-weight: bold;
+          font-size: 2em;
+          margin: 0;
+        }
+
+        & .biography-off {
+          font-size: 1em;
+          max-width: 20em;
+          word-break: break-word;
+          word-wrap: break-word;
+          white-space: pre-line;
+          margin: 0;
+        }
+
+        & .biography-on {
+          font-size: 1em;
+          background-color: variables.$bg;
+          color: variables.$border;
+          border: 1px solid variables.$border;
+          outline: none;
+          padding: 0.5em;
+          max-width: 20em;
+          align-items: center;
+          overflow-wrap: break-word;
+          word-break: break-word;
+          white-space: pre-wrap;
+
+          &:focus {
+            background-color: variables.$border;
+            color: variables.$text;
+          }
+        }
+
+        & .buttons {
+          width: 100%;
+          display: flex;
+          gap: 1em;
+
+          & .editProfile {
+            color: variables.$text;
+            border: 1px solid variables.$border;
+            padding: 1em;
+            background-color: variables.$bg;
+            cursor: pointer;
+
+            &:hover {
+              background-color: variables.$hover;
+            }
+          }
+
+          & .submitProfile {
+            color: variables.$text;
+            border: 1px solid variables.$accent;
+            padding: 1em;
+            background-color: variables.$accent;
+            cursor: pointer;
+
+            &:hover {
+              background-color: variables.$hover-accent;
+              border: 1px solid variables.$hover-accent;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.center_wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin-left: 320px;
+  margin-right: 320px;
+
+  & .chat_container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-left: 320px;
+    margin-right: 320px;
+    margin-top: 73px;
+    margin-bottom: 83px;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+
+    & .message_container {
+      width: 100%;
+      display: flex;
+      margin-top: 4px;
+      margin-bottom: 4px;
+      position: relative;
+      flex-direction: column;
+      overflow-wrap: break-word;
+      word-break: break-word;
+
+      & .options {
+        position: absolute;
+        transform: translateY(-1em);
+        background-color: variables.$bg;
+        border: 1px solid variables.$border;
+        padding: 0;
+        margin: 0;
+        top: 0;
+        right: 1em;
+        z-index: 2000;
+
+        & .buttons {
+          margin: 0;
+          padding: 0.5em;
+          font-size: 0.8em;
+          cursor: pointer;
+
+          &:hover {
+            background-color: variables.$hover;
+          }
+        }
+      }
+
+      &:hover {
+        background-color: variables.$hover;
+      }
+
+      & .top {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        justify-content: space-between;
+
+        & .replied_container {
+          font-size: 0.8em;
+          display: flex;
+          align-items: center;
+          margin-left: 2.5em;
+          gap: 0.5em;
+
+          & .photo {
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            height: 14em;
-            width: 14em;
-            border-radius: 50%;
+            border: none;
+            height: 1em;
+            width: 1em;
+            cursor: pointer;
+            font-size: 1.2em;
+            border-radius: 50px;
 
             & img {
-                height: 100%;
-                width: 100%;
-                object-fit: cover;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
+              height: 100%;
+              width: 100%;
+              object-fit: cover;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
             }
-        }
+          }
 
-        & .username {
+          & .username {
+            font-weight: 900;
             margin: 0;
-            font-size: 1.5em;
-            font-weight: bold;
-        }
+            cursor: pointer;
 
-        & .biography {
-            margin: 0px 1em 0px 1em;
-            word-wrap: break-word;
-            word-break: break-word;
-            white-space: pre-line;
-        }
-    }
+            &:hover {
+              text-decoration: underline;
+            }
+          }
 
-    & .modalWarning {
-        position: fixed;
-        z-index: 100;
-        height: 80%;
-        padding: 2em;
-        background-color: variables.$bg;
+          & p {
+            margin: 0;
+          }
+        }
+      }
+
+      & .bottom {
         display: flex;
-        justify-content: center;
-        flex-direction: column;
-        align-items: center;
+        width: 100%;
 
-        & .span {
-            font-weight: bolder;
-            font-size: 30px;
-        }
-    }
+        & .left_side {
+          width: 5em;
 
-    & .userConfigModal {
-        position: fixed;
-        z-index: 100;
-        height: 80%;
-        padding: 2em;
-        max-width: 60%;
-        background-color: variables.$bg;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        border: 1px solid variables.$border;
-
-        & .logout-button {
-            position: absolute;
-            top: 0.5em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            right: 2.5em;
-            cursor: pointer;
-            font-size: 1.5em;
-            color: variables.$text;
-            background-color: variables.$bg;
-            border: 1px solid variables.$border;
-            padding: 0;
-            margin: 0;
-            z-index: 101;
-
-            &:hover {
-                background-color: variables.$hover;
-            }
-
-            & i {
-                padding: 0.2em;
-            }
-        }
-
-        & .close-button {
-            position: absolute;
-            top: 0.5em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            right: 0.5em;
-            cursor: pointer;
-            font-size: 1.5em;
-            color: variables.$text;
-            background-color: variables.$bg;
-            border: 1px solid variables.$border;
-            padding: 0;
-            margin: 0;
-            z-index: 101;
-
-            &:hover {
-                background-color: variables.$hover;
-            }
-
-            & i {
-                padding: 0.2em;
-            }
-        }
-
-        & .version {
-            position: absolute;
-            bottom: 0.5em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            left: 0.5em;
-            color: variables.$border;
-            padding: 0;
-            margin: 0;
-            cursor: pointer;
-            z-index: 101;
-            text-decoration: underline;
-
-            &:hover {
-                color: variables.$text;
-            }
-        }
-
-        & .modalUserInfo {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 4em;
-
-            & .photoConfigs {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-direction: column;
-                gap: 1em;
-
-                & .modalPhoto {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    overflow: hidden;
-                    height: 18em;
-                    width: 18em;
-                    border-radius: 50%;
-
-                    & img {
-                        height: 100%;
-                        width: 100%;
-                        object-fit: cover;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        text-align: center;
-                    }
-                }
-
-                & input[type="file"] {
-                    display: none;
-                }
-
-                & .buttons {
-                    display: flex;
-                    width: 100%;
-                    gap: 1em;
-
-                    & label {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        height: 100%;
-                        width: 100%;
-                        cursor: pointer;
-                    }
-
-                    & .label {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        background-color: variables.$bg;
-                        color: variables.$text;
-                        border: 1px solid variables.$border;
-                        width: 50%;
-                        height: 4em;
-                        margin: 0;
-                        padding: 0;
-
-                        &:hover {
-                            background-color: variables.$hover;
-                        }
-                    }
-
-                    & button {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        background-color: variables.$accent;
-                        color: variables.$text;
-                        border: none;
-                        padding: 0.5em;
-                        width: 50%;
-                        height: 4em;
-                        cursor: pointer;
-                        font-size: 1em;
-
-                        &:hover {
-                            background-color: variables.$hover-accent;
-                        }
-                    }
-                }
-            }
-
-            & .personalInfo {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 1em;
-                gap: 1em;
-
-                & .name {
-                    font-weight: bold;
-                    font-size: 2em;
-                    margin: 0;
-                }
-
-                & .biography-off {
-                    font-size: 1em;
-                    max-width: 20em;
-                    word-break: break-word;
-                    word-wrap: break-word;
-                    white-space: pre-line;
-                    margin: 0;
-                }
-
-                & .biography-on {
-                    font-size: 1em;
-                    background-color: variables.$bg;
-                    color: variables.$border;
-                    border: 1px solid variables.$border;
-                    outline: none;
-                    padding: 0.5em;
-                    max-width: 20em;
-                    align-items: center;
-                    overflow-wrap: break-word;
-                    word-break: break-word;
-                    white-space: pre-wrap;
-
-                    &:focus {
-                        background-color: variables.$border;
-                        color: variables.$text;
-                    }
-                }
-
-                & .buttons {
-                    width: 100%;
-                    display: flex;
-                    gap: 1em;
-
-                    & .editProfile {
-                        color: variables.$text;
-                        border: 1px solid variables.$border;
-                        padding: 1em;
-                        background-color: variables.$bg;
-                        cursor: pointer;
-
-                        &:hover {
-                            background-color: variables.$hover;
-                        }
-                    }
-
-                    & .submitProfile {
-                        color: variables.$text;
-                        border: 1px solid variables.$accent;
-                        padding: 1em;
-                        background-color: variables.$accent;
-                        cursor: pointer;
-
-                        &:hover {
-                            background-color: variables.$hover-accent;
-                            border: 1px solid variables.$hover-accent;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-.center_wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    margin-left: 320px;
-    margin-right: 320px;
-
-    & .chat_container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin-left: 320px;
-        margin-right: 320px;
-        margin-top: 73px;
-        margin-bottom: 83px;
-        display: none;
-        flex-direction: column;
-        overflow-y: auto;
-
-        & .message_container {
-            width: 100%;
-            display: flex;
-            margin-top: 4px;
-            margin-bottom: 4px;
-            position: relative;
-            flex-direction: column;
-            overflow-wrap: break-word;
-            word-break: break-word;
-
-            & .options {
-                position: absolute;
-                transform: translateY(-1em);
-                background-color: variables.$bg;
-                border: 1px solid variables.$border;
-                padding: 0;
-                margin: 0;
-                top: 0;
-                right: 1em;
-                z-index: 2000;
-
-                & .buttons {
-                    margin: 0;
-                    padding: 0.5em;
-                    font-size: 0.8em;
-                    cursor: pointer;
-
-                    &:hover {
-                        background-color: variables.$hover;
-                    }
-                }
-            }
-
-            &:hover {
-                background-color: variables.$hover;
-            }
-
-            & .top {
-                display: flex;
-                align-items: center;
-                width: 100%;
-                justify-content: space-between;
-
-                & .replied_container {
-                    font-size: 0.8em;
-                    display: flex;
-                    align-items: center;
-                    margin-left: 2.5em;
-                    gap: 0.5em;
-
-                    & .photo {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        overflow: hidden;
-                        border: none;
-                        height: 1em;
-                        width: 1em;
-                        cursor: pointer;
-                        font-size: 1.2em;
-                        border-radius: 50px;
-
-                        & img {
-                            height: 100%;
-                            width: 100%;
-                            object-fit: cover;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            text-align: center;
-                        }
-                    }
-
-                    & .username {
-                        font-weight: 900;
-                        margin: 0;
-                        cursor: pointer;
-
-                        &:hover {
-                            text-decoration: underline;
-                        }
-                    }
-
-                    & p {
-                        margin: 0;
-                    }
-                }
-            }
-
-            & .bottom {
-                display: flex;
-                width: 100%;
-
-                & .left_side {
-                    width: 5em;
-
-                    & .photo {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        overflow: hidden;
-                        border: none;
-                        height: 2em;
-                        margin-left: 1em;
-                        width: 2em;
-                        font-size: 1.2em;
-                        border-radius: 50px;
-
-                        & img {
-                            height: 100%;
-                            width: 100%;
-                            object-fit: cover;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            text-align: center;
-                        }
-                    }
-                }
-
-                & .right_side {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: start;
-                    gap: 5px;
-
-                    & .message_sub_container {
-                        margin: 0;
-                        display: flex;
-                        justify-content: end;
-
-                        & .message {
-                            margin: 0;
-                            white-space: pre-line;
-                        }
-                    }
-
-                    & .message_info {
-                        display: flex;
-                        gap: 1em;
-                        align-items: center;
-                        width: 100%;
-
-                        & .username {
-                            margin: 0;
-                            font-weight: bold;
-                            cursor: pointer;
-
-                            &:hover {
-                                text-decoration: underline;
-                            }
-                        }
-
-                        & .timestamp {
-                            margin: 0;
-                            font-size: 12px;
-                        }
-
-                        & .edit_warning {
-                            margin: 0;
-                            font-size: 10px;
-                            font-style: italic;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    & .changed_message_container {
-        position: fixed;
-        bottom: 0;
-        right: 0;
-        left: 0;
-        margin-left: 320px;
-        margin-right: 320px;
-        margin-bottom: 84px;
-        min-height: 50px;
-        background-color: variables.$bg;
-        border-top: 1px solid variables.$border;
-        align-items: center;
-        justify-content: space-between;
-        display: none;
-
-        & .reply {
-            margin-left: 1em;
-            display: flex;
-            align-items: center;
-            gap: 1em;
-
-            & .replied_user {
-                color: variables.$text;
-                font-weight: 900;
-            }
-        }
-
-        & .edit {
-            margin-left: 1em;
-            display: flex;
-            align-items: center;
-            gap: 1em;
-
-            & .edit_warning {
-                color: variables.$text;
-                font-weight: 900;
-            }
-        }
-
-        & .close_button {
-            margin-right: 1em;
-            cursor: pointer;
-            font-size: 24px;
-            color: variables.$text;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid variables.$border;
-
-            &:hover {
-                background-color: variables.$hover;
-            }
-        }
-    }
-
-    & .input_container {
-        position: fixed;
-        bottom: 0;
-        right: 0;
-        left: 0;
-        margin-left: 320px;
-        margin-right: 320px;
-        min-height: 83px;
-        border-top: 1px solid variables.$border;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        background-color: variables.$bg;
-
-        & .send_button {
-            height: 40px;
-            width: 40px;
-            background-color: variables.$accent;
-            border: 1px solid variables.$accent;
-            color: variables.$text;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 0% 50% 50% 0%;
-
-            &:hover {
-                background-color: variables.$hover-accent;
-                border: 1px solid variables.$hover-accent;
-            }
-        }
-
-        & .textarea {
-            background-color: variables.$bg;
-            color: variables.$border;
-            border: 1px solid variables.$border;
-            min-height: 40px;
-            max-height: 83px;
-            outline: none;
-            display: flex;
-            width: 80%;
-            align-items: center;
-            padding-left: 1em;
-            padding-right: 1em;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            white-space: pre-wrap;
-            overflow-y: auto;
-            border-radius: 50px 0 0 50px;
-
-            &:focus {
-                background-color: variables.$border;
-                color: variables.$text;
-            }
-        }
-
-        & .textarea:empty::before {
-            content: attr(data-placeholder);
-            color: variables.$border;
-        }
-    }
-
-    & .topbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        border-bottom: 1px solid variables.$border;
-        height: 72px;
-        margin-left: 320px;
-        margin-right: 320px;
-        display: none;
-        align-items: center;
-        gap: 1em;
-        z-index: 1000;
-
-        & p {
-            cursor: pointer;
-
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-
-        & .photo {
+          & .photo {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -918,6 +706,1027 @@ nav {
             border-radius: 50px;
 
             & img {
+              height: 100%;
+              width: 100%;
+              object-fit: cover;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+            }
+          }
+        }
+
+        & .right_side {
+          display: flex;
+          flex-direction: column;
+          align-items: start;
+          gap: 5px;
+
+          & .message_sub_container {
+            margin: 0;
+            display: flex;
+            justify-content: end;
+
+            & .message {
+              margin: 0;
+              white-space: pre-line;
+            }
+          }
+
+          & .message_info {
+            display: flex;
+            gap: 1em;
+            align-items: center;
+            width: 100%;
+
+            & .username {
+              margin: 0;
+              font-weight: bold;
+              cursor: pointer;
+
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+
+            & .timestamp {
+              margin: 0;
+              font-size: 12px;
+            }
+
+            & .edit_warning {
+              margin: 0;
+              font-size: 10px;
+              font-style: italic;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  & .changed_message_container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin-left: 320px;
+    margin-right: 320px;
+    margin-bottom: 84px;
+    min-height: 50px;
+    background-color: variables.$bg;
+    border-top: 1px solid variables.$border;
+    align-items: center;
+    justify-content: space-between;
+    display: none;
+
+    & .reply {
+      margin-left: 1em;
+      display: flex;
+      align-items: center;
+      gap: 1em;
+
+      & .replied_user {
+        color: variables.$text;
+        font-weight: 900;
+      }
+    }
+
+    & .edit {
+      margin-left: 1em;
+      display: flex;
+      align-items: center;
+      gap: 1em;
+
+      & .edit_warning {
+        color: variables.$text;
+        font-weight: 900;
+      }
+    }
+
+    & .close_button {
+      margin-right: 1em;
+      cursor: pointer;
+      font-size: 24px;
+      color: variables.$text;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid variables.$border;
+
+      &:hover {
+        background-color: variables.$hover;
+      }
+    }
+  }
+
+  & .input_container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin-left: 320px;
+    margin-right: 320px;
+    min-height: 83px;
+    border-top: 1px solid variables.$border;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background-color: variables.$bg;
+
+    & .send_button {
+      height: 40px;
+      width: 40px;
+      background-color: variables.$accent;
+      border: 1px solid variables.$accent;
+      color: variables.$text;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 0% 50% 50% 0%;
+
+      &:hover {
+        background-color: variables.$hover-accent;
+        border: 1px solid variables.$hover-accent;
+      }
+    }
+
+    & .textarea {
+      background-color: variables.$bg;
+      color: variables.$border;
+      border: 1px solid variables.$border;
+      min-height: 40px;
+      max-height: 83px;
+      outline: none;
+      display: flex;
+      width: 80%;
+      align-items: center;
+      padding-left: 1em;
+      padding-right: 1em;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      border-radius: 50px 0 0 50px;
+
+      &:focus {
+        background-color: variables.$border;
+        color: variables.$text;
+      }
+    }
+
+    & .textarea:empty::before {
+      content: attr(data-placeholder);
+      color: variables.$border;
+    }
+  }
+
+  & .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-bottom: 1px solid variables.$border;
+    height: 72px;
+    margin-left: 320px;
+    margin-right: 320px;
+    display: none;
+    align-items: center;
+    gap: 1em;
+    z-index: 1000;
+
+    & p {
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    & .photo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: none;
+      height: 2em;
+      margin-left: 1em;
+      width: 2em;
+      font-size: 1.2em;
+      border-radius: 50px;
+
+      & img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.left-sidebar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20em;
+  height: 100dvh;
+  z-index: 10;
+
+  & .left-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 20em;
+    border-right: 1px solid variables.$border;
+    position: relative;
+    height: 100dvh;
+
+    & .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: variables.$bg;
+      border-bottom: 1px solid variables.$border;
+
+      & h2 {
+        margin-left: 0.5em;
+      }
+
+      & .theme-button {
+        background-color: variables.$bg;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: variables.$text;
+        padding: 1em;
+        border: none;
+        cursor: pointer;
+        height: 100%;
+        min-width: 4em;
+
+        & i {
+          font-size: 1.5em;
+        }
+
+        &:hover {
+          background-color: variables.$hover;
+          color: variables.$accent;
+        }
+      }
+    }
+
+    & .chats {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      bottom: 0;
+      margin-top: 73px;
+      margin-bottom: 85px;
+      overflow-y: auto;
+
+      & .chat {
+        width: 100%;
+        height: 4em;
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        cursor: pointer;
+
+        &:hover {
+          background-color: variables.$hover;
+        }
+
+        & .photo {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          border: none;
+          height: 2.5em;
+          margin-left: 1em;
+          width: 2.5em;
+          cursor: pointer;
+          font-size: 1.2em;
+          border-radius: 50px;
+
+          & img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
+        }
+      }
+    }
+
+    & .user-infos {
+      display: flex;
+      align-items: center;
+      justify-content: start;
+      overflow: hidden;
+      border-top: 1px solid variables.$border;
+      padding: 1em;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+
+      & .settingsButton {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        padding: 1.2em;
+        background-color: variables.$bg;
+        border: none;
+        cursor: pointer;
+        color: variables.$text;
+
+        &:hover {
+          background-color: variables.$hover;
+        }
+
+        & i {
+          font-size: 1.5em;
+        }
+      }
+
+      & .infoDiv {
+        display: flex;
+
+        & .photo {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          border: none;
+          height: 2.5em;
+          width: 2.5em;
+          cursor: pointer;
+          font-size: 1.2em;
+          border: 2px solid variables.$border;
+          border-radius: 50px;
+
+          &:hover {
+            border-color: variables.$accent;
+          }
+
+          & img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
+        }
+
+        & .name {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: 1em;
+          font-size: 1.2em;
+          font-weight: bold;
+          color: variables.$text;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
+
+.right-sidebar-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 20em;
+  height: 100dvh;
+  z-index: 10;
+
+  & .right-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 20em;
+    border-left: 1px solid variables.$border;
+    position: relative;
+    height: 100dvh;
+
+    & .send-friend-req {
+      border-bottom: 1px solid variables.$border;
+      position: absolute;
+      height: 70px;
+      box-sizing: border-box;
+      top: 0;
+      left: 0;
+      right: 0;
+
+      & .inputs {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 40px;
+
+        & input {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.2em;
+          background-color: variables.$bg;
+          outline: none;
+          width: 100%;
+          height: 100%;
+          border: 1px solid variables.$border;
+          color: variables.$text;
+
+          &:focus {
+            background-color: variables.$hover;
+          }
+        }
+      }
+
+      & .friend_req_button {
+        background-color: variables.$accent;
+        color: variables.$text;
+        border: none;
+        position: absolute;
+        height: 30px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        cursor: pointer;
+
+        &:hover {
+          background-color: variables.$hover-accent;
+        }
+      }
+    }
+
+    & .friends {
+      margin-top: 70px;
+      height: calc(100% - 70px);
+      overflow-y: auto;
+
+      & .friends_container {
+        max-height: 60%;
+        display: flex;
+        flex-direction: column;
+
+        & .friends_accepted {
+          height: 100%;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          & .friend {
+            height: 4em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            &:hover {
+              background-color: variables.$hover;
+            }
+
+            & p {
+              margin-left: 0.8em;
+              overflow: none;
+            }
+          }
+        }
+      }
+
+      & .friend_requests_container {
+        max-height: 40%;
+        display: flex;
+        flex-direction: column;
+
+        & .friend_requests {
+          height: 100%;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          & .friend_request {
+            height: 4em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            &:hover {
+              background-color: variables.$hover;
+            }
+
+            & .accept_button {
+              height: 100%;
+              border: none;
+              background-color: variables.$accent;
+              color: variables.$text;
+              cursor: pointer;
+
+              &:hover {
+                background-color: variables.$hover-accent;
+              }
+            }
+
+            & .waiting {
+              height: 100%;
+              border: none;
+              background-color: transparent;
+              color: variables.$text;
+            }
+
+            & p {
+              margin-left: 0.8em;
+              overflow: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.changelog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  height: 90dvh;
+  background-color: variables.$bg;
+  color: variables.$text;
+  overflow: auto;
+
+  & .version {
+    width: 600px;
+
+    & hr {
+      border: 1px solid variables.$border;
+    }
+
+    & h1 {
+      font-size: 2.5em;
+      margin-bottom: 1em;
+      text-decoration: underline variables.$accent;
+    }
+
+    & li {
+      & a {
+        color: variables.$accent;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  & button {
+    background-color: variables.$bg;
+    border: 1px solid variables.$border;
+    color: variables.$text;
+    padding: 1em;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+
+    &:hover {
+      background-color: variables.$hover;
+    }
+  }
+}
+
+@media (max-width: 720px) {
+  .mobile_buttons {
+    display: flex;
+  }
+
+  .opacity {
+    position: fixed;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+
+    & .userDetails {
+      z-index: 100;
+      position: fixed;
+      background-color: variables.$bg;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      border: 1px solid variables.$border;
+
+      & .close-button {
+        position: absolute;
+        top: 0.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        right: 0.5em;
+        cursor: pointer;
+        font-size: 1.5em;
+        color: variables.$text;
+        background-color: variables.$bg;
+        border: 1px solid variables.$border;
+        padding: 0;
+        margin: 0;
+        z-index: 101;
+
+        &:hover {
+          background-color: variables.$hover;
+        }
+
+        & i {
+          padding: 0.2em;
+        }
+      }
+
+      & .userIcon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        height: 14em;
+        width: 14em;
+        border-radius: 50%;
+
+        & img {
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
+      }
+
+      & .username {
+        margin: 0;
+        font-size: 1.5em;
+        font-weight: bold;
+      }
+
+      & .biography {
+        margin: 0px 1em 0px 1em;
+        word-wrap: break-word;
+        word-break: break-word;
+      }
+    }
+
+    & .modalWarning {
+      position: fixed;
+      z-index: 100;
+      height: 80%;
+      width: 70%;
+      padding: 2em;
+      background-color: variables.$bg;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    & .userConfigModal {
+      position: fixed;
+      z-index: 100;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: none;
+      padding: 2em;
+      height: 80%;
+      background-color: variables.$bg;
+      display: none;
+      justify-content: start;
+      align-items: center;
+      flex-direction: column;
+
+      & .close-button {
+        position: absolute;
+        top: 0.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        right: 0.5em;
+        cursor: pointer;
+        font-size: 1.5em;
+        color: variables.$text;
+        background-color: variables.$bg;
+        border: 1px solid variables.$border;
+        padding: 0;
+        margin: 0;
+        z-index: 101;
+
+        &:hover {
+          background-color: variables.$hover;
+        }
+
+        & i {
+          padding: 0.2em;
+        }
+      }
+
+      & .version {
+        position: absolute;
+        bottom: 0.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        left: 0.5em;
+        color: variables.$border;
+        padding: 0;
+        margin: 0;
+        z-index: 101;
+        text-decoration: underline;
+
+        &:hover {
+          color: variables.$text;
+        }
+      }
+
+      & .modalUserInfo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 0;
+
+        & .photoConfigs {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: 1em;
+
+          & .modalPhoto {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            height: 14em;
+            width: 14em;
+            border-radius: 50%;
+
+            & img {
+              height: 100%;
+              width: 100%;
+              object-fit: cover;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+            }
+          }
+
+          & input[type="file"] {
+            display: none;
+          }
+
+          & .buttons {
+            display: flex;
+            width: 100%;
+            gap: 1em;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+
+            & label {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: 100%;
+              width: 100%;
+              cursor: pointer;
+            }
+
+            & .label {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background-color: variables.$bg;
+              color: variables.$text;
+              border: 1px solid variables.$border;
+              width: 50%;
+              height: 4em;
+              margin: 0;
+              padding: 0;
+
+              &:hover {
+                background-color: variables.$hover;
+              }
+            }
+
+            & button {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background-color: variables.$accent;
+              color: variables.$text;
+              border: none;
+              padding: 0.5em;
+              width: 50%;
+              height: 4em;
+              cursor: pointer;
+              font-size: 1em;
+
+              &:hover {
+                background-color: variables.$hover-accent;
+              }
+            }
+          }
+        }
+
+        & .personalInfo {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1em;
+
+          & .name {
+            font-weight: bold;
+            font-size: 2em;
+            margin: 0;
+          }
+
+          & .biography-off {
+            font-size: 1em;
+            max-width: 20em;
+            word-break: break-word;
+            word-wrap: break-word;
+            white-space: pre-line;
+            margin: 0;
+          }
+
+          & .biography-on {
+            font-size: 1em;
+            padding: 0.5em;
+            background-color: variables.$bg;
+            color: variables.$border;
+            border: 1px solid variables.$border;
+            outline: none;
+            min-width: 10em;
+            max-width: 20em;
+            align-items: center;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: pre-wrap;
+
+            &:focus {
+              background-color: variables.$border;
+              color: variables.$text;
+            }
+          }
+
+          & .buttons {
+            width: 100%;
+            display: flex;
+            gap: 1em;
+
+            & .editProfile {
+              color: variables.$text;
+              border: 1px solid variables.$border;
+              padding: 1em;
+              background-color: variables.$bg;
+              cursor: pointer;
+
+              &:hover {
+                background-color: variables.$hover;
+              }
+            }
+
+            & .submitProfile {
+              color: variables.$text;
+              border: 1px solid variables.$accent;
+              padding: 1em;
+              background-color: variables.$accent;
+              cursor: pointer;
+
+              &:hover {
+                background-color: variables.$hover-accent;
+                border: 1px solid variables.$hover-accent;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .center_wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin-left: 0;
+    margin-right: 0;
+
+    & .chat_container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: 73px;
+      margin-bottom: 83px;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+
+      & .message_container {
+        width: 100%;
+        display: flex;
+        margin-top: 4px;
+        margin-bottom: 4px;
+        position: relative;
+        flex-direction: column;
+        overflow-wrap: break-word;
+        word-break: break-word;
+
+        & .options {
+          position: absolute;
+          transform: translateY(-1em);
+          background-color: variables.$bg;
+          border: 1px solid variables.$border;
+          padding: 0;
+          margin: 0;
+          top: 0;
+          right: 1em;
+          z-index: 2000;
+
+          & .buttons {
+            margin: 0;
+            padding: 0.5em;
+            font-size: 0.8em;
+            cursor: pointer;
+
+            &:hover {
+              background-color: variables.$hover;
+            }
+          }
+        }
+
+        &:hover {
+          background-color: variables.$hover;
+        }
+
+        & .top {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          justify-content: space-between;
+
+          & .replied_container {
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            margin-left: 2.5em;
+            gap: 0.5em;
+
+            & .photo {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+              border: none;
+              height: 1em;
+              width: 1em;
+              cursor: pointer;
+              font-size: 1.2em;
+              border-radius: 50px;
+
+              & img {
                 height: 100%;
                 width: 100%;
                 object-fit: cover;
@@ -925,1335 +1734,553 @@ nav {
                 align-items: center;
                 justify-content: center;
                 text-align: center;
-            }
-        }
-    }
-}
-
-.left-sidebar-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 20em;
-    height: 100dvh;
-    z-index: 10;
-
-    & .left-sidebar {
-        display: flex;
-        flex-direction: column;
-        width: 20em;
-        border-right: 1px solid variables.$border;
-        position: relative;
-        height: 100dvh;
-
-        & .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: variables.$bg;
-            border-bottom: 1px solid variables.$border;
-
-            & h2 {
-                margin-left: 0.5em;
+              }
             }
 
-            & .theme-button {
-                background-color: variables.$bg;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: variables.$text;
-                padding: 1em;
-                border: none;
-                cursor: pointer;
-                height: 100%;
-                min-width: 4em;
+            & .username {
+              font-weight: 900;
+              margin: 0;
+              cursor: pointer;
 
-                & i {
-                    font-size: 1.5em;
-                }
-
-                &:hover {
-                    background-color: variables.$hover;
-                    color: variables.$accent;
-                }
+              &:hover {
+                text-decoration: underline;
+              }
             }
+
+            & p {
+              margin: 0;
+            }
+          }
         }
 
-        & .chats {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            bottom: 0;
-            margin-top: 73px;
-            margin-bottom: 85px;
-            overflow-y: auto;
+        & .bottom {
+          display: flex;
+          width: 100%;
 
-            & .chat {
-                width: 100%;
-                height: 4em;
-                display: flex;
-                align-items: center;
-                gap: 1em;
-                cursor: pointer;
-
-                &:hover {
-                    background-color: variables.$hover;
-                }
-
-                & .photo {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    overflow: hidden;
-                    border: none;
-                    height: 2.5em;
-                    margin-left: 1em;
-                    width: 2.5em;
-                    cursor: pointer;
-                    font-size: 1.2em;
-                    border-radius: 50px;
-
-                    & img {
-                        height: 100%;
-                        width: 100%;
-                        object-fit: cover;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        text-align: center;
-                    }
-                }
-            }
-        }
-
-        & .user-infos {
-            display: flex;
-            align-items: center;
-            justify-content: start;
-            overflow: hidden;
-            border-top: 1px solid variables.$border;
-            padding: 1em;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+          & .left_side {
+            width: 5em;
 
             & .photo {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+              border: none;
+              height: 2em;
+              margin-left: 1em;
+              width: 2em;
+              cursor: pointer;
+              font-size: 1.2em;
+              border-radius: 50px;
+
+              & img {
+                height: 100%;
+                width: 100%;
+                object-fit: cover;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                overflow: hidden;
-                border: none;
-                height: 2.5em;
-                width: 2.5em;
-                cursor: pointer;
-                font-size: 1.2em;
-                border: 2px solid variables.$border;
-                border-radius: 50px;
+                text-align: center;
+              }
+            }
+          }
 
-                &:hover {
-                    border-color: variables.$accent;
-                }
+          & .right_side {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            gap: 5px;
 
-                & img {
-                    height: 100%;
-                    width: 100%;
-                    object-fit: cover;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    text-align: center;
-                }
+            & p {
+              margin: 0;
             }
 
-            & .name {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-left: 1em;
-                font-size: 1.2em;
+            & .message_info {
+              display: flex;
+              gap: 1em;
+              align-items: center;
+              width: 100%;
+
+              & .username {
                 font-weight: bold;
-                color: variables.$text;
                 cursor: pointer;
 
                 &:hover {
-                    text-decoration: underline;
+                  text-decoration: underline;
                 }
-            }
-        }
-    }
-}
+              }
 
-.right-sidebar-wrapper {
+              & .timestamp {
+                font-size: 12px;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    & .changed_message_container {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      margin-left: 0px;
+      margin-right: 0px;
+      margin-bottom: 84px;
+      min-height: 50px;
+      background-color: variables.$bg;
+      border-top: 1px solid variables.$border;
+      align-items: center;
+      justify-content: space-between;
+      display: none;
+
+      & .reply {
+        margin-left: 1em;
+        display: flex;
+        align-items: center;
+        gap: 1em;
+
+        & .replied_user {
+          color: variables.$text;
+          font-weight: 900;
+        }
+      }
+
+      & .edit {
+        margin-left: 1em;
+        display: flex;
+        align-items: center;
+        gap: 1em;
+
+        & .edit_warning {
+          color: variables.$text;
+          font-weight: 900;
+        }
+      }
+
+      & .close_button {
+        margin-right: 1em;
+        cursor: pointer;
+        font-size: 24px;
+        color: variables.$text;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid variables.$border;
+
+        &:hover {
+          background-color: variables.$hover;
+        }
+      }
+    }
+
+    & .input_container {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      margin-left: 0;
+      margin-right: 0;
+      min-height: 83px;
+      border-top: 1px solid variables.$border;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background-color: variables.$bg;
+
+      & .send_button {
+        height: 40px;
+        width: 40px;
+        background-color: variables.$accent;
+        border: 1px solid variables.$accent;
+        color: variables.$text;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 0% 50% 50% 0%;
+
+        &:hover {
+          background-color: variables.$hover-accent;
+          border: 1px solid variables.$hover-accent;
+        }
+      }
+
+      & .textarea {
+        background-color: variables.$bg;
+        color: variables.$border;
+        border: 1px solid variables.$border;
+        min-height: 40px;
+        max-height: 83px;
+        outline: none;
+        display: flex;
+        width: 80%;
+        align-items: center;
+        padding-left: 1em;
+        padding-right: 1em;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        white-space: pre-wrap;
+        overflow-y: auto;
+        border-radius: 50px 0 0 50px;
+
+        &:focus {
+          background-color: variables.$border;
+          color: variables.$text;
+        }
+      }
+
+      & .textarea:empty::before {
+        content: attr(data-placeholder);
+        color: variables.$border;
+      }
+    }
+
+    & .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      border-bottom: 1px solid variables.$border;
+      height: 72px;
+      margin-left: 0;
+      margin-right: 0;
+      display: none;
+      align-items: center;
+      gap: 1em;
+      z-index: 1000;
+
+      & .photo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: none;
+        height: 2em;
+        margin-left: 1em;
+        width: 2em;
+        cursor: pointer;
+        font-size: 1.2em;
+        border-radius: 50px;
+
+        & img {
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .right-sidebar-wrapper {
     position: fixed;
     top: 0;
     right: 0;
     width: 20em;
     height: 100dvh;
     z-index: 10;
+    background-color: variables.$bg;
+    display: none;
 
     & .right-sidebar {
-        display: flex;
-        flex-direction: column;
-        width: 20em;
-        border-left: 1px solid variables.$border;
-        position: relative;
-        height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      width: 20em;
+      border-left: 1px solid variables.$border;
+      position: relative;
+      height: 100dvh;
 
-        & .send-friend-req {
-            border-bottom: 1px solid variables.$border;
-            position: absolute;
-            height: 70px;
-            box-sizing: border-box;
-            top: 0;
-            left: 0;
-            right: 0;
+      & .send-friend-req {
+        border-bottom: 1px solid variables.$border;
+        position: absolute;
+        height: 70px;
+        box-sizing: border-box;
+        top: 0;
+        left: 0;
+        right: 0;
 
-            & .inputs {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 40px;
+        & .inputs {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 40px;
 
-                & input {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.2em;
-                    background-color: variables.$bg;
-                    outline: none;
-                    width: 100%;
-                    height: 100%;
-                    border: 1px solid variables.$border;
-                    color: variables.$text;
+          & input {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            background-color: variables.$bg;
+            outline: none;
+            width: 100%;
+            height: 100%;
+            border: 1px solid variables.$border;
+            color: variables.$text;
 
-                    &:focus {
-                        background-color: variables.$hover;
-                    }
-                }
+            &:focus {
+              background-color: variables.$hover;
             }
+          }
+        }
 
-            & .friend_req_button {
+        & .friend_req_button {
+          background-color: variables.$accent;
+          color: variables.$text;
+          border: none;
+          position: absolute;
+          height: 30px;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          cursor: pointer;
+
+          &:hover {
+            background-color: variables.$hover-accent;
+          }
+        }
+      }
+
+      & .friends {
+        margin-top: 70px;
+        height: calc(100% - 70px);
+        overflow-y: auto;
+
+        & .friends_container {
+          max-height: 60%;
+          display: flex;
+          flex-direction: column;
+
+          & .friends_accepted {
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            & .friend {
+              height: 4em;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+
+              &:hover {
+                background-color: variables.$hover;
+              }
+
+              & p {
+                margin-left: 0.8em;
+                overflow: none;
+              }
+            }
+          }
+        }
+
+        & .friend_requests_container {
+          max-height: 40%;
+          display: flex;
+          flex-direction: column;
+
+          & .friend_requests {
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            & .friend_request {
+              height: 4em;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+
+              &:hover {
+                background-color: variables.$hover;
+              }
+
+              & .accept_button {
+                height: 100%;
+                border: none;
                 background-color: variables.$accent;
                 color: variables.$text;
-                border: none;
-                position: absolute;
-                height: 30px;
-                bottom: 0;
-                left: 0;
-                right: 0;
                 cursor: pointer;
 
                 &:hover {
-                    background-color: variables.$hover-accent;
+                  background-color: variables.$hover-accent;
                 }
+              }
+
+              & .waiting {
+                height: 100%;
+                border: none;
+                background-color: transparent;
+                color: variables.$text;
+              }
+
+              & p {
+                margin-left: 0.8em;
+                overflow: none;
+              }
             }
+          }
         }
-
-        & .friends {
-            margin-top: 70px;
-            height: calc(100% - 70px);
-            overflow-y: auto;
-
-            & .friends_container {
-                max-height: 60%;
-                display: flex;
-                flex-direction: column;
-
-                & .friends_accepted {
-                    height: 100%;
-                    overflow-y: auto;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 4px;
-
-                    & .friend {
-                        height: 4em;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-
-                        &:hover {
-                            background-color: variables.$hover;
-                        }
-
-                        & p {
-                            margin-left: 0.8em;
-                            overflow: none;
-                        }
-                    }
-                }
-            }
-
-            & .friend_requests_container {
-                max-height: 40%;
-                display: flex;
-                flex-direction: column;
-
-                & .friend_requests {
-                    height: 100%;
-                    overflow-y: auto;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 4px;
-
-                    & .friend_request {
-                        height: 4em;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-
-                        &:hover {
-                            background-color: variables.$hover;
-                        }
-
-                        & .accept_button {
-                            height: 100%;
-                            border: none;
-                            background-color: variables.$accent;
-                            color: variables.$text;
-                            cursor: pointer;
-
-                            &:hover {
-                                background-color: variables.$hover-accent;
-                            }
-                        }
-
-                        & .waiting {
-                            height: 100%;
-                            border: none;
-                            background-color: transparent;
-                            color: variables.$text;
-                        }
-
-                        & p {
-                            margin-left: 0.8em;
-                            overflow: none;
-                        }
-                    }
-                }
-            }
-        }
+      }
     }
-}
+  }
 
-.changelog {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1em;
-    height: 90dvh;
+  .left-sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20em;
+    height: 100dvh;
+    z-index: 10;
     background-color: variables.$bg;
-    color: variables.$text;
-    overflow: auto;
+    display: none;
 
-    & .version {
-        width: 600px;
+    & .left-sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 20em;
+      border-right: 1px solid variables.$border;
+      position: relative;
+      height: 100dvh;
 
-        & hr {
-            border: 1px solid variables.$border;
-        }
-
-        & h1 {
-            font-size: 2.5em;
-            margin-bottom: 1em;
-            text-decoration: underline variables.$accent;
-        }
-
-        & li {
-            & a {
-                color: variables.$accent;
-                text-decoration: underline;
-            }
-        }
-    }
-
-    & button {
-        background-color: variables.$bg;
-        border: 1px solid variables.$border;
-        color: variables.$text;
-        padding: 1em;
-        cursor: pointer;
-        font-size: 1em;
-        font-weight: bold;
-
-        &:hover {
-            background-color: variables.$hover;
-        }
-    }
-}
-
-@media (max-width: 720px) {
-    .mobile_buttons {
+      & .header {
         display: flex;
-    }
-
-    .opacity {
-        position: fixed;
-        display: none;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
+        background-color: variables.$bg;
+        border-bottom: 1px solid variables.$border;
+
+        & h2 {
+          margin-left: 0.5em;
+        }
+
+        & .theme-button {
+          background-color: variables.$bg;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: variables.$text;
+          padding: 1em;
+          border: none;
+          cursor: pointer;
+          height: 100%;
+          min-width: 4em;
+
+          & i {
+            font-size: 1.5em;
+          }
+
+          &:hover {
+            background-color: variables.$hover;
+            color: variables.$accent;
+          }
+        }
+      }
+
+      & .chats {
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 100;
-
-        & .userDetails {
-            z-index: 100;
-            position: fixed;
-            background-color: variables.$bg;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80%;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            border: 1px solid variables.$border;
-
-            & .close-button {
-                position: absolute;
-                top: 0.5em;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                right: 0.5em;
-                cursor: pointer;
-                font-size: 1.5em;
-                color: variables.$text;
-                background-color: variables.$bg;
-                border: 1px solid variables.$border;
-                padding: 0;
-                margin: 0;
-                z-index: 101;
-
-                &:hover {
-                    background-color: variables.$hover;
-                }
-
-                & i {
-                    padding: 0.2em;
-                }
-            }
-
-            & .userIcon {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-                height: 14em;
-                width: 14em;
-                border-radius: 50%;
-
-                & img {
-                    height: 100%;
-                    width: 100%;
-                    object-fit: cover;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    text-align: center;
-                }
-            }
-
-            & .username {
-                margin: 0;
-                font-size: 1.5em;
-                font-weight: bold;
-            }
-
-            & .biography {
-                margin: 0px 1em 0px 1em;
-                word-wrap: break-word;
-                word-break: break-word;
-            }
-        }
-
-        & .modalWarning {
-            position: fixed;
-            z-index: 100;
-            height: 80%;
-            width: 70%;
-            padding: 2em;
-            background-color: variables.$bg;
-            display: flex;
-            justify-content: center;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        & .userConfigModal {
-            position: fixed;
-            z-index: 100;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: none;
-            padding: 2em;
-            height: 80%;
-            background-color: variables.$bg;
-            display: none;
-            justify-content: start;
-            align-items: center;
-            flex-direction: column;
-
-            & .close-button {
-                position: absolute;
-                top: 0.5em;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                right: 0.5em;
-                cursor: pointer;
-                font-size: 1.5em;
-                color: variables.$text;
-                background-color: variables.$bg;
-                border: 1px solid variables.$border;
-                padding: 0;
-                margin: 0;
-                z-index: 101;
-
-                &:hover {
-                    background-color: variables.$hover;
-                }
-
-                & i {
-                    padding: 0.2em;
-                }
-            }
-
-            & .version {
-                position: absolute;
-                bottom: 0.5em;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                left: 0.5em;
-                color: variables.$border;
-                padding: 0;
-                margin: 0;
-                z-index: 101;
-                text-decoration: underline;
-
-                &:hover {
-                    color: variables.$text;
-                }
-            }
-
-            & .modalUserInfo {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-direction: column;
-                gap: 0;
-
-                & .photoConfigs {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-direction: column;
-                    gap: 1em;
-
-                    & .modalPhoto {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        overflow: hidden;
-                        height: 14em;
-                        width: 14em;
-                        border-radius: 50%;
-
-                        & img {
-                            height: 100%;
-                            width: 100%;
-                            object-fit: cover;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            text-align: center;
-                        }
-                    }
-
-                    & input[type="file"] {
-                        display: none;
-                    }
-
-                    & .buttons {
-                        display: flex;
-                        width: 100%;
-                        gap: 1em;
-                        justify-content: center;
-                        align-items: center;
-                        flex-direction: column;
-
-                        & label {
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            height: 100%;
-                            width: 100%;
-                            cursor: pointer;
-                        }
-
-                        & .label {
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            background-color: variables.$bg;
-                            color: variables.$text;
-                            border: 1px solid variables.$border;
-                            width: 50%;
-                            height: 4em;
-                            margin: 0;
-                            padding: 0;
-
-                            &:hover {
-                                background-color: variables.$hover;
-                            }
-                        }
-
-                        & button {
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            background-color: variables.$accent;
-                            color: variables.$text;
-                            border: none;
-                            padding: 0.5em;
-                            width: 50%;
-                            height: 4em;
-                            cursor: pointer;
-                            font-size: 1em;
-
-                            &:hover {
-                                background-color: variables.$hover-accent;
-                            }
-                        }
-                    }
-                }
-
-                & .personalInfo {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 1em;
-
-                    & .name {
-                        font-weight: bold;
-                        font-size: 2em;
-                        margin: 0;
-                    }
-
-                    & .biography-off {
-                        font-size: 1em;
-                        max-width: 20em;
-                        word-break: break-word;
-                        word-wrap: break-word;
-                        white-space: pre-line;
-                        margin: 0;
-                    }
-
-                    & .biography-on {
-                        font-size: 1em;
-                        padding: 0.5em;
-                        background-color: variables.$bg;
-                        color: variables.$border;
-                        border: 1px solid variables.$border;
-                        outline: none;
-                        min-width: 10em;
-                        max-width: 20em;
-                        align-items: center;
-                        overflow-wrap: break-word;
-                        word-break: break-word;
-                        white-space: pre-wrap;
-
-                        &:focus {
-                            background-color: variables.$border;
-                            color: variables.$text;
-                        }
-                    }
-
-                    & .buttons {
-                        width: 100%;
-                        display: flex;
-                        gap: 1em;
-
-                        & .editProfile {
-                            color: variables.$text;
-                            border: 1px solid variables.$border;
-                            padding: 1em;
-                            background-color: variables.$bg;
-                            cursor: pointer;
-
-                            &:hover {
-                                background-color: variables.$hover;
-                            }
-                        }
-
-                        & .submitProfile {
-                            color: variables.$text;
-                            border: 1px solid variables.$accent;
-                            padding: 1em;
-                            background-color: variables.$accent;
-                            cursor: pointer;
-
-                            &:hover {
-                                background-color: variables.$hover-accent;
-                                border: 1px solid variables.$hover-accent;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    .center_wrapper {
-        position: fixed;
-        top: 0;
-        left: 0;
         bottom: 0;
-        right: 0;
-        margin-left: 0;
-        margin-right: 0;
+        margin-top: 73px;
+        margin-bottom: 85px;
 
-        & .chat_container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            margin-left: 0;
-            margin-right: 0;
-            margin-top: 73px;
-            margin-bottom: 83px;
-            display: none;
-            flex-direction: column;
-            overflow-y: auto;
+        & .chat {
+          width: 100%;
+          height: 4em;
+          display: flex;
+          align-items: center;
+          gap: 1em;
+          cursor: pointer;
 
-            & .message_container {
-                width: 100%;
-                display: flex;
-                margin-top: 4px;
-                margin-bottom: 4px;
-                position: relative;
-                flex-direction: column;
-                overflow-wrap: break-word;
-                word-break: break-word;
+          &:hover {
+            background-color: variables.$hover;
+          }
 
-                & .options {
-                    position: absolute;
-                    transform: translateY(-1em);
-                    background-color: variables.$bg;
-                    border: 1px solid variables.$border;
-                    padding: 0;
-                    margin: 0;
-                    top: 0;
-                    right: 1em;
-                    z-index: 2000;
-
-                    & .buttons {
-                        margin: 0;
-                        padding: 0.5em;
-                        font-size: 0.8em;
-                        cursor: pointer;
-
-                        &:hover {
-                            background-color: variables.$hover;
-                        }
-                    }
-                }
-
-                &:hover {
-                    background-color: variables.$hover;
-                }
-
-                & .top {
-                    display: flex;
-                    align-items: center;
-                    width: 100%;
-                    justify-content: space-between;
-
-                    & .replied_container {
-                        font-size: 0.8em;
-                        display: flex;
-                        align-items: center;
-                        margin-left: 2.5em;
-                        gap: 0.5em;
-
-                        & .photo {
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            overflow: hidden;
-                            border: none;
-                            height: 1em;
-                            width: 1em;
-                            cursor: pointer;
-                            font-size: 1.2em;
-                            border-radius: 50px;
-
-                            & img {
-                                height: 100%;
-                                width: 100%;
-                                object-fit: cover;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                text-align: center;
-                            }
-                        }
-
-                        & .username {
-                            font-weight: 900;
-                            margin: 0;
-                            cursor: pointer;
-
-                            &:hover {
-                                text-decoration: underline;
-                            }
-                        }
-
-                        & p {
-                            margin: 0;
-                        }
-                    }
-                }
-
-                & .bottom {
-                    display: flex;
-                    width: 100%;
-
-                    & .left_side {
-                        width: 5em;
-
-                        & .photo {
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            overflow: hidden;
-                            border: none;
-                            height: 2em;
-                            margin-left: 1em;
-                            width: 2em;
-                            cursor: pointer;
-                            font-size: 1.2em;
-                            border-radius: 50px;
-
-                            & img {
-                                height: 100%;
-                                width: 100%;
-                                object-fit: cover;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                text-align: center;
-                            }
-                        }
-                    }
-
-                    & .right_side {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: start;
-                        gap: 5px;
-
-                        & p {
-                            margin: 0;
-                        }
-
-                        & .message_info {
-                            display: flex;
-                            gap: 1em;
-                            align-items: center;
-                            width: 100%;
-
-                            & .username {
-                                font-weight: bold;
-                                cursor: pointer;
-
-                                &:hover {
-                                    text-decoration: underline;
-                                }
-                            }
-
-                            & .timestamp {
-                                font-size: 12px;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        & .changed_message_container {
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            left: 0;
-            margin-left: 0px;
-            margin-right: 0px;
-            margin-bottom: 84px;
-            min-height: 50px;
-            background-color: variables.$bg;
-            border-top: 1px solid variables.$border;
-            align-items: center;
-            justify-content: space-between;
-            display: none;
-
-            & .reply {
-                margin-left: 1em;
-                display: flex;
-                align-items: center;
-                gap: 1em;
-
-                & .replied_user {
-                    color: variables.$text;
-                    font-weight: 900;
-                }
-            }
-
-            & .edit {
-                margin-left: 1em;
-                display: flex;
-                align-items: center;
-                gap: 1em;
-
-                & .edit_warning {
-                    color: variables.$text;
-                    font-weight: 900;
-                }
-            }
-
-            & .close_button {
-                margin-right: 1em;
-                cursor: pointer;
-                font-size: 24px;
-                color: variables.$text;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid variables.$border;
-
-                &:hover {
-                    background-color: variables.$hover;
-                }
-            }
-        }
-
-        & .input_container {
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            left: 0;
-            margin-left: 0;
-            margin-right: 0;
-            min-height: 83px;
-            border-top: 1px solid variables.$border;
-            display: none;
+          & .photo {
+            display: flex;
             align-items: center;
             justify-content: center;
-            background-color: variables.$bg;
+            overflow: hidden;
+            border: none;
+            height: 2.5em;
+            margin-left: 1em;
+            width: 2.5em;
+            cursor: pointer;
+            font-size: 1.2em;
+            border-radius: 50px;
 
-            & .send_button {
-                height: 40px;
-                width: 40px;
-                background-color: variables.$accent;
-                border: 1px solid variables.$accent;
-                color: variables.$text;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                border-radius: 0% 50% 50% 0%;
-
-                &:hover {
-                    background-color: variables.$hover-accent;
-                    border: 1px solid variables.$hover-accent;
-                }
+            & img {
+              height: 100%;
+              width: 100%;
+              object-fit: cover;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
             }
-
-            & .textarea {
-                background-color: variables.$bg;
-                color: variables.$border;
-                border: 1px solid variables.$border;
-                min-height: 40px;
-                max-height: 83px;
-                outline: none;
-                display: flex;
-                width: 80%;
-                align-items: center;
-                padding-left: 1em;
-                padding-right: 1em;
-                overflow-wrap: break-word;
-                word-break: break-word;
-                white-space: pre-wrap;
-                overflow-y: auto;
-                border-radius: 50px 0 0 50px;
-
-                &:focus {
-                    background-color: variables.$border;
-                    color: variables.$text;
-                }
-            }
-
-            & .textarea:empty::before {
-                content: attr(data-placeholder);
-                color: variables.$border;
-            }
+          }
         }
+      }
 
-        & .topbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            border-bottom: 1px solid variables.$border;
-            height: 72px;
-            margin-left: 0;
-            margin-right: 0;
-            display: none;
-            align-items: center;
-            gap: 1em;
-            z-index: 1000;
-
-            & .photo {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-                border: none;
-                height: 2em;
-                margin-left: 1em;
-                width: 2em;
-                cursor: pointer;
-                font-size: 1.2em;
-                border-radius: 50px;
-
-                & img {
-                    height: 100%;
-                    width: 100%;
-                    object-fit: cover;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    text-align: center;
-                }
-            }
-        }
-    }
-
-    .right-sidebar-wrapper {
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: 20em;
-        height: 100dvh;
-        z-index: 10;
-        background-color: variables.$bg;
-        display: none;
-
-        & .right-sidebar {
-            display: flex;
-            flex-direction: column;
-            width: 20em;
-            border-left: 1px solid variables.$border;
-            position: relative;
-            height: 100dvh;
-
-            & .send-friend-req {
-                border-bottom: 1px solid variables.$border;
-                position: absolute;
-                height: 70px;
-                box-sizing: border-box;
-                top: 0;
-                left: 0;
-                right: 0;
-
-                & .inputs {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    height: 40px;
-
-                    & input {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 1.2em;
-                        background-color: variables.$bg;
-                        outline: none;
-                        width: 100%;
-                        height: 100%;
-                        border: 1px solid variables.$border;
-                        color: variables.$text;
-
-                        &:focus {
-                            background-color: variables.$hover;
-                        }
-                    }
-                }
-
-                & .friend_req_button {
-                    background-color: variables.$accent;
-                    color: variables.$text;
-                    border: none;
-                    position: absolute;
-                    height: 30px;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    cursor: pointer;
-
-                    &:hover {
-                        background-color: variables.$hover-accent;
-                    }
-                }
-            }
-
-            & .friends {
-                margin-top: 70px;
-                height: calc(100% - 70px);
-                overflow-y: auto;
-
-                & .friends_container {
-                    max-height: 60%;
-                    display: flex;
-                    flex-direction: column;
-
-                    & .friends_accepted {
-                        height: 100%;
-                        overflow-y: auto;
-                        display: flex;
-                        flex-direction: column;
-                        gap: 4px;
-
-                        & .friend {
-                            height: 4em;
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-
-                            &:hover {
-                                background-color: variables.$hover;
-                            }
-
-                            & p {
-                                margin-left: 0.8em;
-                                overflow: none;
-                            }
-                        }
-                    }
-                }
-
-                & .friend_requests_container {
-                    max-height: 40%;
-                    display: flex;
-                    flex-direction: column;
-
-                    & .friend_requests {
-                        height: 100%;
-                        overflow-y: auto;
-                        display: flex;
-                        flex-direction: column;
-                        gap: 4px;
-
-                        & .friend_request {
-                            height: 4em;
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-
-                            &:hover {
-                                background-color: variables.$hover;
-                            }
-
-                            & .accept_button {
-                                height: 100%;
-                                border: none;
-                                background-color: variables.$accent;
-                                color: variables.$text;
-                                cursor: pointer;
-
-                                &:hover {
-                                    background-color: variables.$hover-accent;
-                                }
-                            }
-
-                            & .waiting {
-                                height: 100%;
-                                border: none;
-                                background-color: transparent;
-                                color: variables.$text;
-                            }
-
-                            & p {
-                                margin-left: 0.8em;
-                                overflow: none;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    .left-sidebar-wrapper {
-        position: fixed;
-        top: 0;
+      & .user-infos {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        overflow: hidden;
+        border-top: 1px solid variables.$border;
+        padding: 1em;
+        position: absolute;
+        bottom: 0;
         left: 0;
-        width: 20em;
-        height: 100dvh;
-        z-index: 10;
-        background-color: variables.$bg;
-        display: none;
+        right: 0;
 
-        & .left-sidebar {
+        & .photo {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          border: none;
+          height: 2.5em;
+          width: 2.5em;
+          cursor: pointer;
+          font-size: 1.2em;
+          border: 2px solid variables.$border;
+          border-radius: 50px;
+
+          &:hover {
+            border-color: variables.$accent;
+          }
+
+          & img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
             display: flex;
-            flex-direction: column;
-            width: 20em;
-            border-right: 1px solid variables.$border;
-            position: relative;
-            height: 100dvh;
-
-            & .header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                background-color: variables.$bg;
-                border-bottom: 1px solid variables.$border;
-
-                & h2 {
-                    margin-left: 0.5em;
-                }
-
-                & .theme-button {
-                    background-color: variables.$bg;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: variables.$text;
-                    padding: 1em;
-                    border: none;
-                    cursor: pointer;
-                    height: 100%;
-                    min-width: 4em;
-
-                    & i {
-                        font-size: 1.5em;
-                    }
-
-                    &:hover {
-                        background-color: variables.$hover;
-                        color: variables.$accent;
-                    }
-                }
-            }
-
-            & .chats {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                bottom: 0;
-                margin-top: 73px;
-                margin-bottom: 85px;
-
-                & .chat {
-                    width: 100%;
-                    height: 4em;
-                    display: flex;
-                    align-items: center;
-                    gap: 1em;
-                    cursor: pointer;
-
-                    &:hover {
-                        background-color: variables.$hover;
-                    }
-
-                    & .photo {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        overflow: hidden;
-                        border: none;
-                        height: 2.5em;
-                        margin-left: 1em;
-                        width: 2.5em;
-                        cursor: pointer;
-                        font-size: 1.2em;
-                        border-radius: 50px;
-
-                        & img {
-                            height: 100%;
-                            width: 100%;
-                            object-fit: cover;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            text-align: center;
-                        }
-                    }
-                }
-            }
-
-            & .user-infos {
-                display: flex;
-                align-items: center;
-                justify-content: start;
-                overflow: hidden;
-                border-top: 1px solid variables.$border;
-                padding: 1em;
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-
-                & .photo {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    overflow: hidden;
-                    border: none;
-                    height: 2.5em;
-                    width: 2.5em;
-                    cursor: pointer;
-                    font-size: 1.2em;
-                    border: 2px solid variables.$border;
-                    border-radius: 50px;
-
-                    &:hover {
-                        border-color: variables.$accent;
-                    }
-
-                    & img {
-                        height: 100%;
-                        width: 100%;
-                        object-fit: cover;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        text-align: center;
-                    }
-                }
-
-                & .name {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin-left: 1em;
-                    font-size: 1.2em;
-                    font-weight: bold;
-                    color: variables.$text;
-                }
-            }
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
         }
+
+        & .name {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: 1em;
+          font-size: 1.2em;
+          font-weight: bold;
+          color: variables.$text;
+        }
+      }
     }
+  }
 }
