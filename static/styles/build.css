@@ -947,7 +947,30 @@ nav .nav-buttons .theme-button:hover {
   left: 0;
   right: 0;
 }
-.left-sidebar-wrapper .left-sidebar .user-infos .photo {
+.left-sidebar-wrapper .left-sidebar .user-infos .settingsButton {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 1.2em;
+  background-color: var(--bg);
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+}
+.left-sidebar-wrapper .left-sidebar .user-infos .settingsButton:hover {
+  background-color: var(--hover);
+}
+.left-sidebar-wrapper .left-sidebar .user-infos .settingsButton i {
+  font-size: 1.5em;
+}
+.left-sidebar-wrapper .left-sidebar .user-infos .infoDiv {
+  display: flex;
+}
+.left-sidebar-wrapper .left-sidebar .user-infos .infoDiv .photo {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -960,10 +983,10 @@ nav .nav-buttons .theme-button:hover {
   border: 2px solid var(--border);
   border-radius: 50px;
 }
-.left-sidebar-wrapper .left-sidebar .user-infos .photo:hover {
+.left-sidebar-wrapper .left-sidebar .user-infos .infoDiv .photo:hover {
   border-color: var(--accent);
 }
-.left-sidebar-wrapper .left-sidebar .user-infos .photo img {
+.left-sidebar-wrapper .left-sidebar .user-infos .infoDiv .photo img {
   height: 100%;
   width: 100%;
   object-fit: cover;
@@ -972,7 +995,7 @@ nav .nav-buttons .theme-button:hover {
   justify-content: center;
   text-align: center;
 }
-.left-sidebar-wrapper .left-sidebar .user-infos .name {
+.left-sidebar-wrapper .left-sidebar .user-infos .infoDiv .name {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -982,7 +1005,7 @@ nav .nav-buttons .theme-button:hover {
   color: var(--text);
   cursor: pointer;
 }
-.left-sidebar-wrapper .left-sidebar .user-infos .name:hover {
+.left-sidebar-wrapper .left-sidebar .user-infos .infoDiv .name:hover {
   text-decoration: underline;
 }
 
