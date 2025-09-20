@@ -1211,6 +1211,29 @@ nav {
               margin-left: 0.8em;
               overflow: none;
             }
+
+            & .buttonsDiv {
+              height: 100%;
+
+              & .cancel {
+                height: 100%;
+                border: none;
+                cursor: pointer;
+                background-color: transparent;
+                color: variables.$text;
+
+                &:hover {
+                  color: variables.$accent;
+                }
+              }
+
+              & .waiting {
+                height: 100%;
+                border: none;
+                background-color: transparent;
+                color: variables.$text;
+              }
+            }
           }
         }
       }
@@ -1237,23 +1260,39 @@ nav {
               background-color: variables.$hover;
             }
 
-            & .accept_button {
+            & .buttonsDiv {
               height: 100%;
-              border: none;
-              background-color: variables.$accent;
-              color: variables.$text;
-              cursor: pointer;
 
-              &:hover {
-                background-color: variables.$hover-accent;
+              & .accept_button {
+                height: 100%;
+                border: none;
+                background-color: variables.$accent;
+                color: variables.$text;
+                cursor: pointer;
+
+                &:hover {
+                  background-color: variables.$hover-accent;
+                }
               }
-            }
 
-            & .waiting {
-              height: 100%;
-              border: none;
-              background-color: transparent;
-              color: variables.$text;
+              & .cancel {
+                height: 100%;
+                border: none;
+                cursor: pointer;
+                background-color: transparent;
+                color: variables.$text;
+
+                &:hover {
+                  color: variables.$accent;
+                }
+              }
+
+              & .waiting {
+                height: 100%;
+                border: none;
+                background-color: transparent;
+                color: variables.$text;
+              }
             }
 
             & p {
