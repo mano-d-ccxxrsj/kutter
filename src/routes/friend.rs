@@ -12,13 +12,13 @@ use tokio::sync::{RwLock, broadcast};
 pub async fn friend_table(pool: &PgPool) -> Result<(), sqlx::Error> {
     sqlx::query(
         r#"
-        CREATE TABLE IF NOT EXISTS friends (
-            id SERIAL PRIMARY KEY,
-            sender_username VARCHAR(255) NOT NULL REFERENCES users(username),
-            receiver_username VARCHAR(255) NOT NULL REFERENCES users(username),
-            status VARCHAR(255) NOT NULL
-        )
-        "#,
+            CREATE TABLE IF NOT EXISTS friends (
+                id SERIAL PRIMARY KEY,
+                sender_username VARCHAR(255) NOT NULL REFERENCES users(username),
+                receiver_username VARCHAR(255) NOT NULL REFERENCES users(username),
+                status VARCHAR(255) NOT NULL
+            )
+            "#,
     )
     .execute(pool)
     .await?;
@@ -46,6 +46,11 @@ pub struct FriendRequestStatus {
     pub status: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CancelFriendRequest {
+    pub friend_req_id: i32,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WebSocketMessage {
     pub action: String,
@@ -57,6 +62,7 @@ pub struct WebSocketMessage {
 pub enum FriendAction {
     SendRequest(Friends),
     Accept(FriendRequestStatus),
+    Cancel(CancelFriendRequest),
 }
 
 #[derive(Debug, Clone)]
@@ -165,25 +171,25 @@ pub async fn ws_handler(
                                     };
 
                                     let already_sent = match sqlx::query_scalar::<_, bool>(
-                                        "SELECT EXISTS(SELECT * FROM friends WHERE (sender_username = $1 AND receiver_username = $2) OR (sender_username = $2 AND receiver_username = $1))",
-                                    )
-                                    .bind(&new_friend.sender_username)
-                                    .bind(&new_friend.receiver_username)
-                                    .fetch_one(&db_pool)
-                                    .await {
-                                        Ok(already_sent) => already_sent,
-                                        Err(err) => {
-                                            eprintln!("Error checking if friend request already exists: {}", err);
-                                            let error_msg = WebSocketMessage {
-                                                action: "error".to_string(),
-                                                payload: serde_json::json!({"message": "Error checking friend request status"}),
-                                            };
-                                            if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                                let _ = message_session.text(error_json).await;
+                                            "SELECT EXISTS(SELECT * FROM friends WHERE (sender_username = $1 AND receiver_username = $2) OR (sender_username = $2 AND receiver_username = $1))",
+                                        )
+                                        .bind(&new_friend.sender_username)
+                                        .bind(&new_friend.receiver_username)
+                                        .fetch_one(&db_pool)
+                                        .await {
+                                            Ok(already_sent) => already_sent,
+                                            Err(err) => {
+                                                eprintln!("Error checking if friend request already exists: {}", err);
+                                                let error_msg = WebSocketMessage {
+                                                    action: "error".to_string(),
+                                                    payload: serde_json::json!({"message": "Error checking friend request status"}),
+                                                };
+                                                if let Ok(error_json) = serde_json::to_string(&error_msg) {
+                                                    let _ = message_session.text(error_json).await;
+                                                }
+                                                return;
                                             }
-                                            return;
-                                        }
-                                    };
+                                        };
 
                                     let send_to_itself =
                                         new_friend.sender_username == new_friend.receiver_username;
@@ -225,25 +231,74 @@ pub async fn ws_handler(
                                     }
 
                                     match sqlx::query_as::<_, Friends>(
-                                        "INSERT INTO friends (sender_username, receiver_username, status) VALUES ($1, $2, 'pending') RETURNING *",
-                                    )
-                                    .bind(&new_friend.sender_username)
-                                    .bind(&new_friend.receiver_username)
-                                    .fetch_one(&db_pool)
-                                    .await
-                                    {
-                                        Ok(friend) => {
-                                            println!("Friend request created: {:?}", friend);
-                                            let _ = tx.send(FriendAction::SendRequest(friend));
+                                            "INSERT INTO friends (sender_username, receiver_username, status) VALUES ($1, $2, 'pending') RETURNING *",
+                                        )
+                                        .bind(&new_friend.sender_username)
+                                        .bind(&new_friend.receiver_username)
+                                        .fetch_one(&db_pool)
+                                        .await
+                                        {
+                                            Ok(friend) => {
+                                                println!("Friend request created: {:?}", friend);
+                                                let _ = tx.send(FriendAction::SendRequest(friend));
+                                            }
+                                            Err(_) => {
+                                                eprintln!("Error creating friend request");
+                                                let error_msg = WebSocketMessage {
+                                                    action: "error".to_string(),
+                                                    payload: serde_json::json!({"message": "Failed to create friend request"}),
+                                                };
+                                                if let Ok(error_json) = serde_json::to_string(&error_msg) {
+                                                    let _ = message_session.text(error_json).await;
+                                                }
+                                            }
                                         }
-                                        Err(_) => {
-                                            eprintln!("Error creating friend request");
-                                            let error_msg = WebSocketMessage {
-                                                action: "error".to_string(),
-                                                payload: serde_json::json!({"message": "Failed to create friend request"}),
-                                            };
-                                            if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                                let _ = message_session.text(error_json).await;
+                                }
+                            }
+
+                            "cancel" => {
+                                if let Some(friend_req_id) =
+                                    ws_msg.payload.get("friend_req_id").and_then(|v| v.as_i64())
+                                {
+                                    let id_i32 = friend_req_id as i32;
+
+                                    let can_cancel = match sqlx::query_as::<_, Friends>(
+                                            "SELECT * FROM friends WHERE id = $1 AND (receiver_username = $2 OR sender_username = $2)"
+                                        )
+                                        .bind(&id_i32)
+                                        .bind(&username)
+                                        .fetch_all(&db_pool)
+                                        .await
+                                        {
+                                            Ok(_) => true,
+                                            Err(_) => false
+                                        };
+
+                                    if can_cancel {
+                                        match sqlx::query("DELETE FROM friends WHERE id = $1")
+                                            .bind(&id_i32)
+                                            .execute(&db_pool)
+                                            .await
+                                        {
+                                            Ok(_) => {
+                                                println!("Friend delete successfully");
+                                                let _ = tx.send(FriendAction::Cancel(
+                                                    CancelFriendRequest {
+                                                        friend_req_id: id_i32,
+                                                    },
+                                                ));
+                                            }
+                                            Err(e) => {
+                                                println!("Error deleting friend: {}", e);
+                                                let message = WebSocketMessage {
+                                                    action: "error".to_string(),
+                                                    payload: serde_json::json!({"message": "Error removing friend"}),
+                                                };
+                                                if let Ok(ws_message) =
+                                                    serde_json::to_string(&message)
+                                                {
+                                                    let _ = message_session.text(ws_message).await;
+                                                }
                                             }
                                         }
                                     }
@@ -256,26 +311,26 @@ pub async fn ws_handler(
                                 {
                                     let receiver = username.clone();
                                     let is_receiver = match sqlx::query_scalar::<_, bool>(
-                                        "SELECT EXISTS(SELECT * FROM friends WHERE (id = $1 AND receiver_username = $2))"
-                                    )
-                                    .bind(friend_id as i32)
-                                    .bind(&receiver)
-                                    .fetch_one(&db_pool)
-                                    .await
-                                    {
-                                        Ok(is_receiver) => is_receiver,
-                                        Err(err) => {
-                                            eprintln!("Error checking if user receives: {}", err);
-                                            let error_msg = WebSocketMessage {
-                                                action: "error".to_string(),
-                                                payload: serde_json::json!({"message": "Error checking if user receives"}),
-                                            };
-                                            if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                                let _ = message_session.text(error_json).await;
+                                            "SELECT EXISTS(SELECT * FROM friends WHERE (id = $1 AND receiver_username = $2))"
+                                        )
+                                        .bind(friend_id as i32)
+                                        .bind(&receiver)
+                                        .fetch_one(&db_pool)
+                                        .await
+                                        {
+                                            Ok(is_receiver) => is_receiver,
+                                            Err(err) => {
+                                                eprintln!("Error checking if user receives: {}", err);
+                                                let error_msg = WebSocketMessage {
+                                                    action: "error".to_string(),
+                                                    payload: serde_json::json!({"message": "Error checking if user receives"}),
+                                                };
+                                                if let Ok(error_json) = serde_json::to_string(&error_msg) {
+                                                    let _ = message_session.text(error_json).await;
+                                                }
+                                                return;
                                             }
-                                            return;
-                                        }
-                                    };
+                                        };
 
                                     let sender: String = match sqlx::query_scalar(
                                         "SELECT sender_username FROM friends WHERE id = $1",
@@ -288,9 +343,9 @@ pub async fn ws_handler(
                                         Err(err) => {
                                             eprintln!("Failed to get sender: {}", err);
                                             let _ = message_session.text(serde_json::json!({
-                                                "action": "error",
-                                                "payload": { "message": "Failed to get sender" }
-                                            }).to_string()).await;
+                                                    "action": "error",
+                                                    "payload": { "message": "Failed to get sender" }
+                                                }).to_string()).await;
                                             return;
                                         }
                                     };
@@ -308,33 +363,33 @@ pub async fn ws_handler(
                                     }
 
                                     match sqlx::query_as::<_, Friends>(
-                                        "UPDATE friends SET status = 'accepted' WHERE id = $1 RETURNING *",
-                                    )
-                                    .bind(friend_id as i32)
-                                    .fetch_one(&db_pool)
-                                    .await
-                                    {
-                                        Ok(friend) => {
-                                            println!("Friend request accepted: {:?}", friend);
-                                            let status = FriendRequestStatus {
-                                                id: friend.id.unwrap(),
-                                                sender_username: sender,
-                                                receiver_username: receiver,
-                                                status: "accepted".to_string(),
-                                            };
-                                            let _ = tx.send(FriendAction::Accept(status));
-                                        }
-                                        Err(_) => {
-                                            eprintln!("Error accepting friend request");
-                                            let error_msg = WebSocketMessage {
-                                                action: "error".to_string(),
-                                                payload: serde_json::json!({"message": "Failed to accept friend request"}),
-                                            };
-                                            if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                                let _ = message_session.text(error_json).await;
+                                            "UPDATE friends SET status = 'accepted' WHERE id = $1 RETURNING *",
+                                        )
+                                        .bind(friend_id as i32)
+                                        .fetch_one(&db_pool)
+                                        .await
+                                        {
+                                            Ok(friend) => {
+                                                println!("Friend request accepted: {:?}", friend);
+                                                let status = FriendRequestStatus {
+                                                    id: friend.id.unwrap(),
+                                                    sender_username: sender,
+                                                    receiver_username: receiver,
+                                                    status: "accepted".to_string(),
+                                                };
+                                                let _ = tx.send(FriendAction::Accept(status));
+                                            }
+                                            Err(_) => {
+                                                eprintln!("Error accepting friend request");
+                                                let error_msg = WebSocketMessage {
+                                                    action: "error".to_string(),
+                                                    payload: serde_json::json!({"message": "Failed to accept friend request"}),
+                                                };
+                                                if let Ok(error_json) = serde_json::to_string(&error_msg) {
+                                                    let _ = message_session.text(error_json).await;
+                                                }
                                             }
                                         }
-                                    }
                                 }
                             }
 
@@ -400,6 +455,7 @@ pub async fn ws_handler(
                                                     Err(_) => false
                                                 }
                                             }
+                                            FriendAction::Cancel(_) => true
                                         };
 
                             if should_send {

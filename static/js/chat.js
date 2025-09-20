@@ -8,10 +8,10 @@ const DOM_ELEMENTS = {
   userDetails: document.getElementById("userDetails"),
   userConfigModal: document.getElementById("userConfigModal"),
   userConfigModalCloseButton: document.getElementById(
-    "userConfigModalCloseButton",
+    "userConfigModalCloseButton"
   ),
   userConfigModalLogoutButton: document.getElementById(
-    "userConfigModalLogoutButton",
+    "userConfigModalLogoutButton"
   ),
   modalPhotoConfig: document.getElementById("photoConfig"),
   version: document.getElementById("version"),
@@ -110,13 +110,13 @@ const Utils = {
       const left_side_wrapper = new Hammer(DOM_ELEMENTS.left_side_wrapper);
       const chatContainer = new Hammer(DOM_ELEMENTS.chatContainer);
 
-      chatContainer.on("swipe", function(event) {
+      chatContainer.on("swipe", function (event) {
         swiper(event.direction);
       });
-      left_side_wrapper.on("swipe", function(event) {
+      left_side_wrapper.on("swipe", function (event) {
         swiper(event.direction);
       });
-      right_side_wrapper.on("swipe", function(event) {
+      right_side_wrapper.on("swipe", function (event) {
         swiper(event.direction);
       });
     }
@@ -126,7 +126,7 @@ const Utils = {
     if (APP_STATE.currentReply !== null) {
       const reply = document.getElementById(`reply_${APP_STATE.currentReply}`);
       const replyCloseButton = document.getElementById(
-        `close_button_${APP_STATE.currentReply}`,
+        `close_button_${APP_STATE.currentReply}`
       );
       reply?.remove();
       replyCloseButton?.remove();
@@ -136,7 +136,7 @@ const Utils = {
     if (APP_STATE.currentEdit !== null) {
       const edit = document.getElementById(`edit_${APP_STATE.currentEdit}`);
       const editCloseButton = document.getElementById(
-        `close_button_${APP_STATE.currentEdit}`,
+        `close_button_${APP_STATE.currentEdit}`
       );
       edit?.remove();
       editCloseButton?.remove();
@@ -196,7 +196,7 @@ const User = {
       return false;
     }
 
-    document.addEventListener("contextmenu", function(e) {
+    document.addEventListener("contextmenu", function (e) {
       e.preventDefault();
     });
 
@@ -269,7 +269,7 @@ const User = {
 
     photoDiv.addEventListener("click", () => {
       User.renderInfos(user.username);
-    })
+    });
 
     DOM_ELEMENTS.settingsButton.addEventListener("click", () => {
       DOM_ELEMENTS.modalBase.style.display = "flex";
@@ -281,9 +281,9 @@ const User = {
     nameDiv.textContent = `@${user.username}`;
 
     const infoDiv = document.createElement("div");
-    infoDiv.classList.add("infoDiv")
+    infoDiv.classList.add("infoDiv");
     infoDiv.appendChild(photoDiv);
-    infoDiv.appendChild(nameDiv)
+    infoDiv.appendChild(nameDiv);
     DOM_ELEMENTS.userInfoContainer.prepend(infoDiv);
     nameDiv.addEventListener("click", () => User.renderInfos(user.username));
   },
@@ -306,7 +306,7 @@ const User = {
     });
 
     DOM_ELEMENTS.topbarUsername.addEventListener("click", () =>
-      User.renderInfos(APP_STATE.currentChatPartner),
+      User.renderInfos(APP_STATE.currentChatPartner)
     );
 
     DOM_ELEMENTS.version.addEventListener("click", () => {
@@ -323,7 +323,7 @@ const User = {
         setTimeout(() => {
           window.location.replace("/");
         }, 1500);
-      },
+      }
     );
 
     const modalPhotoDiv = document.createElement("div");
@@ -392,7 +392,7 @@ const User = {
     DOM_ELEMENTS.fileInput.addEventListener("change", () => {
       if (DOM_ELEMENTS.fileInput.files.length > 0) {
         modalPhotoElement.src = URL.createObjectURL(
-          DOM_ELEMENTS.fileInput.files[0],
+          DOM_ELEMENTS.fileInput.files[0]
         );
       }
     });
@@ -432,7 +432,7 @@ const Friends = {
     await Friends.loadFriendRequests();
     DOM_ELEMENTS.friendReqButton.addEventListener(
       "click",
-      Friends.sendFriendRequest,
+      Friends.sendFriendRequest
     );
   },
 
@@ -458,27 +458,40 @@ const Friends = {
   createFriendRequest: (receiverUsername, appendButton, friendId) => {
     const friendRequest = document.createElement("div");
     friendRequest.classList.add("friend_request");
-    friendRequest.id = friendId;
+    friendRequest.id = `f${friendId}`;
 
     const friendRequestP = document.createElement("p");
     friendRequestP.textContent = `@${receiverUsername}`;
     friendRequest.appendChild(friendRequestP);
+
+    const buttonsDiv = document.createElement("div");
+    buttonsDiv.classList.add("buttonsDiv");
+
+    const cancelButton = document.createElement("button");
+    cancelButton.classList.add("cancel");
+    cancelButton.addEventListener("click", () =>
+      Friends.cancelFriendRequest(friendId)
+    );
 
     const acceptButton = document.createElement("button");
 
     if (!appendButton) {
       acceptButton.classList.add("waiting");
       acceptButton.textContent = "Waiting";
+      cancelButton.textContent = "Cancel";
       acceptButton.disabled = true;
     } else {
       acceptButton.classList.add("accept_button");
+      cancelButton.textContent = "Ignore";
       acceptButton.textContent = "Accept";
       acceptButton.addEventListener("click", () =>
-        Friends.acceptRequest(friendId),
+        Friends.acceptRequest(friendId)
       );
     }
 
-    friendRequest.appendChild(acceptButton);
+    buttonsDiv.appendChild(acceptButton);
+    buttonsDiv.appendChild(cancelButton);
+    friendRequest.appendChild(buttonsDiv);
     DOM_ELEMENTS.friendRequests.appendChild(friendRequest);
   },
 
@@ -496,18 +509,47 @@ const Friends = {
   },
 
   acceptFriendRequest: (username, friendRequestId) => {
+    const removePrevious = document.getElementById(`f${friendRequestId}`);
+    removePrevious?.remove();
     const friend = document.createElement("div");
     friend.classList.add("friend");
-    friend.id = friendRequestId;
+    friend.id = `f${friendRequestId}`;
 
     const friendUsername = document.createElement("p");
     friendUsername.textContent = `@${username}`;
     friend.appendChild(friendUsername);
 
+    const buttonsDiv = document.createElement("div");
+    buttonsDiv.classList.add("buttonsDiv");
+
+    const cancelButton = document.createElement("button");
+    cancelButton.classList.add("cancel");
+    cancelButton.textContent = "Remove";
+    cancelButton.addEventListener("click", () =>
+      Friends.cancelFriendRequest(friendRequestId)
+    );
+
+    buttonsDiv.appendChild(cancelButton);
+    friend.appendChild(buttonsDiv);
+
     const existingRequest = document.getElementById(friendRequestId);
     if (existingRequest) existingRequest.remove();
 
     DOM_ELEMENTS.friendsAccepted.appendChild(friend);
+  },
+
+  cancelFriendRequest: (friend_req_id) => {
+    const wsMessage = {
+      action: "cancel",
+      payload: { friend_req_id: friend_req_id },
+    };
+
+    try {
+      APP_STATE.sockets.friendReq.send(JSON.stringify(wsMessage));
+    } catch (e) {
+      Utils.verifyToast();
+      createErrorAlert("Error sending friend request");
+    }
   },
 
   sendFriendRequest: () => {
@@ -539,19 +581,24 @@ const Friends = {
           Friends.createFriendRequest(
             isSender ? data.receiver_username : data.sender_username,
             !isSender,
-            data.id,
+            data.id
           );
           if (!isSender)
             createSuccessAlert(
-              `You received a friend request from @${data.sender_username}!`,
+              `You received a friend request from @${data.sender_username}!`
             );
+          break;
+
+        case "cancel":
+          let friend = document.getElementById(`f${data.friend_req_id}`);
+          friend?.remove();
           break;
 
         case "accept":
           const isReceiver = user === data.receiver_username;
           Friends.acceptFriendRequest(
             isReceiver ? data.sender_username : data.receiver_username,
-            data.id,
+            data.id
           );
           const wsMessage = {
             action: "new_chat",
@@ -615,7 +662,7 @@ const Chat = {
         if (APP_STATE.currentEdit !== null) {
           const edit = document.getElementById(`edit_${APP_STATE.currentEdit}`);
           const close_button = document.getElementById(
-            `close_button_${APP_STATE.currentEdit}`,
+            `close_button_${APP_STATE.currentEdit}`
           );
           edit.remove();
           close_button.remove();
@@ -663,10 +710,10 @@ const Chat = {
         DOM_ELEMENTS.sendMessageInput.textContent = "";
         if (APP_STATE.currentReply !== null) {
           const reply = document.getElementById(
-            `reply_${APP_STATE.currentReply}`,
+            `reply_${APP_STATE.currentReply}`
           );
           const close_button = document.getElementById(
-            `close_button_${APP_STATE.currentReply}`,
+            `close_button_${APP_STATE.currentReply}`
           );
           reply.remove();
           close_button.remove();
@@ -736,7 +783,7 @@ const Chat = {
                   data.replied_message,
                   data.time,
                   can_change,
-                  has_reply,
+                  has_reply
                 );
                 APP_STATE.renderedMessages.add(messageId);
               }
@@ -745,7 +792,7 @@ const Chat = {
             }
           } else if (data.action === "delete") {
             const message_to_delete = document.getElementById(
-              `${data.message_id}`,
+              `${data.message_id}`
             );
             if (message_to_delete) {
               message_to_delete.remove();
@@ -761,10 +808,10 @@ const Chat = {
               const message = document.getElementById(`raw_${data.id}`);
               message.textContent = `${data.message}`;
               const messageInfo = document.getElementById(
-                `message_info_${data.id}`,
+                `message_info_${data.id}`
               );
               const already_edited = document.getElementById(
-                `edit_warning_${data.id}`,
+                `edit_warning_${data.id}`
               );
               if (!already_edited) {
                 const edit_warning = document.createElement("p");
@@ -862,7 +909,7 @@ const Chat = {
 
     if (existing_chat) {
       APP_STATE.chats = APP_STATE.chats.filter(
-        (chat_obj) => chat_obj.id !== id,
+        (chat_obj) => chat_obj.id !== id
       );
     }
 
@@ -893,7 +940,7 @@ const Chat = {
     if (APP_STATE.currentReply !== null) {
       const reply = document.getElementById(`reply_${APP_STATE.currentReply}`);
       const close_button = document.getElementById(
-        `close_button_${APP_STATE.currentReply}`,
+        `close_button_${APP_STATE.currentReply}`
       );
       reply.remove();
       close_button.remove();
@@ -945,7 +992,9 @@ const Chat = {
 
     const messages = await response.json();
     messages.forEach((message) => {
-      const messageId = `${message.id || message.timestamp}_${message.username}`;
+      const messageId = `${message.id || message.timestamp}_${
+        message.username
+      }`;
       const can_change =
         APP_STATE.currentUser.username === message.username ? true : false;
       const has_reply =
@@ -960,7 +1009,7 @@ const Chat = {
           message.time,
           can_change,
           has_reply,
-          message.edited,
+          message.edited
         );
         APP_STATE.renderedMessages.add(messageId);
       }
@@ -981,7 +1030,7 @@ const Chat = {
     timestamp,
     can_change,
     has_reply,
-    edited,
+    edited
   ) => {
     const messageContainer = document.createElement("div");
     messageContainer.classList.add("message_container");
@@ -1005,7 +1054,7 @@ const Chat = {
       reply_user.textContent = `@${fetch_replied_user}:`;
       reply_user.classList.add("username");
       reply_user.addEventListener("click", () =>
-        User.renderInfos(fetch_replied_user),
+        User.renderInfos(fetch_replied_user)
       );
       const reply_message = document.createElement("p");
       const photo = document.createElement("div");
