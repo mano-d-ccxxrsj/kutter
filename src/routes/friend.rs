@@ -1,6 +1,6 @@
 use crate::middlewares::verify_token;
 use actix_web::{Error, HttpRequest, HttpResponse, get, web};
-use actix_ws::Message;
+use actix_ws::{Message, Session};
 use futures_util::StreamExt as _;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
@@ -128,7 +128,6 @@ pub async fn ws_handler(
         while let Some(Ok(msg)) = msg_stream.next().await {
             match msg {
                 Message::Text(text) => {
-                    println!("Received text message: {}", text);
                     if let Ok(ws_msg) = serde_json::from_str::<WebSocketMessage>(&text) {
                         match ws_msg.action.as_str() {
                             "send_request" => {
@@ -142,11 +141,6 @@ pub async fn ws_handler(
                                         status: "pending".to_string(),
                                     };
 
-                                    println!(
-                                        "Friend request from {} to {}",
-                                        new_friend.sender_username, new_friend.receiver_username
-                                    );
-
                                     let user_exists = match sqlx::query_scalar::<_, bool>(
                                         "SELECT EXISTS(SELECT * FROM users WHERE username = $1)",
                                     )
@@ -155,17 +149,13 @@ pub async fn ws_handler(
                                     .await
                                     {
                                         Ok(user_exists) => user_exists,
-                                        Err(err) => {
-                                            eprintln!("Error checking if user exists: {}", err);
-                                            let error_msg = WebSocketMessage {
-                                                action: "error".to_string(),
-                                                payload: serde_json::json!({"message": "Error checking friend request status"}),
-                                            };
-                                            if let Ok(error_json) =
-                                                serde_json::to_string(&error_msg)
-                                            {
-                                                let _ = message_session.text(error_json).await;
-                                            }
+                                        Err(e) => {
+                                            eprintln!("Error checking if user exists: {}", e);
+                                            ws_error_message(
+                                                &mut message_session,
+                                                "Error checking if user exists",
+                                            )
+                                            .await;
                                             return;
                                         }
                                     };
@@ -178,15 +168,9 @@ pub async fn ws_handler(
                                         .fetch_one(&db_pool)
                                         .await {
                                             Ok(already_sent) => already_sent,
-                                            Err(err) => {
-                                                eprintln!("Error checking if friend request already exists: {}", err);
-                                                let error_msg = WebSocketMessage {
-                                                    action: "error".to_string(),
-                                                    payload: serde_json::json!({"message": "Error checking friend request status"}),
-                                                };
-                                                if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                                    let _ = message_session.text(error_json).await;
-                                                }
+                                            Err(e) => {
+                                                eprintln!("Error checking if friend request already exists: {}", e);
+                                                ws_error_message(&mut message_session, "Error checking if friend request already exists").await;
                                                 return;
                                             }
                                         };
@@ -195,38 +179,26 @@ pub async fn ws_handler(
                                         new_friend.sender_username == new_friend.receiver_username;
 
                                     if send_to_itself {
-                                        println!("Cannot send request to yourself");
-                                        let error_msg = WebSocketMessage {
-                                            action: "error".to_string(),
-                                            payload: serde_json::json!({"message": "Cannot send friend request to yourself"}),
-                                        };
-                                        if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                            let _ = message_session.text(error_json).await;
-                                        }
+                                        ws_error_message(
+                                            &mut message_session,
+                                            "You can't send message to yourself",
+                                        )
+                                        .await;
                                         return;
                                     }
 
                                     if already_sent {
-                                        println!("Friend req already sent or received");
-                                        let error_msg = WebSocketMessage {
-                                            action: "error".to_string(),
-                                            payload: serde_json::json!({"message": "Friend request already sent or received"}),
-                                        };
-                                        if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                            let _ = message_session.text(error_json).await;
-                                        }
+                                        ws_error_message(
+                                            &mut message_session,
+                                            "Friend request already sent or received",
+                                        )
+                                        .await;
                                         return;
                                     }
 
                                     if !user_exists {
-                                        println!("User not found");
-                                        let error_msg = WebSocketMessage {
-                                            action: "error".to_string(),
-                                            payload: serde_json::json!({"message": "User not found"}),
-                                        };
-                                        if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                            let _ = message_session.text(error_json).await;
-                                        }
+                                        ws_error_message(&mut message_session, "User not found")
+                                            .await;
                                         return;
                                     }
 
@@ -239,18 +211,11 @@ pub async fn ws_handler(
                                         .await
                                         {
                                             Ok(friend) => {
-                                                println!("Friend request created: {:?}", friend);
                                                 let _ = tx.send(FriendAction::SendRequest(friend));
                                             }
-                                            Err(_) => {
-                                                eprintln!("Error creating friend request");
-                                                let error_msg = WebSocketMessage {
-                                                    action: "error".to_string(),
-                                                    payload: serde_json::json!({"message": "Failed to create friend request"}),
-                                                };
-                                                if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                                    let _ = message_session.text(error_json).await;
-                                                }
+                                            Err(e) => {
+                                                eprintln!("Error creating friend request: {}", e);
+                                                ws_error_message(&mut message_session, "Error creating friend request").await;
                                             }
                                         }
                                 }
@@ -281,7 +246,6 @@ pub async fn ws_handler(
                                             .await
                                         {
                                             Ok(_) => {
-                                                println!("Friend delete successfully");
                                                 let _ = tx.send(FriendAction::Cancel(
                                                     CancelFriendRequest {
                                                         friend_req_id: id_i32,
@@ -290,15 +254,11 @@ pub async fn ws_handler(
                                             }
                                             Err(e) => {
                                                 println!("Error deleting friend: {}", e);
-                                                let message = WebSocketMessage {
-                                                    action: "error".to_string(),
-                                                    payload: serde_json::json!({"message": "Error removing friend"}),
-                                                };
-                                                if let Ok(ws_message) =
-                                                    serde_json::to_string(&message)
-                                                {
-                                                    let _ = message_session.text(ws_message).await;
-                                                }
+                                                ws_error_message(
+                                                    &mut message_session,
+                                                    "Error deleting friend",
+                                                )
+                                                .await;
                                             }
                                         }
                                     }
@@ -319,15 +279,9 @@ pub async fn ws_handler(
                                         .await
                                         {
                                             Ok(is_receiver) => is_receiver,
-                                            Err(err) => {
-                                                eprintln!("Error checking if user receives: {}", err);
-                                                let error_msg = WebSocketMessage {
-                                                    action: "error".to_string(),
-                                                    payload: serde_json::json!({"message": "Error checking if user receives"}),
-                                                };
-                                                if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                                    let _ = message_session.text(error_json).await;
-                                                }
+                                            Err(e) => {
+                                                eprintln!("Error checking if user is receiver: {}", e);
+                                                ws_error_message(&mut message_session, "Error checking if user is receiver").await;
                                                 return;
                                             }
                                         };
@@ -340,25 +294,23 @@ pub async fn ws_handler(
                                     .await
                                     {
                                         Ok(sender) => sender,
-                                        Err(err) => {
-                                            eprintln!("Failed to get sender: {}", err);
-                                            let _ = message_session.text(serde_json::json!({
-                                                    "action": "error",
-                                                    "payload": { "message": "Failed to get sender" }
-                                                }).to_string()).await;
+                                        Err(e) => {
+                                            eprintln!("Failed to get sender: {}", e);
+                                            ws_error_message(
+                                                &mut message_session,
+                                                "Failed to get sender",
+                                            )
+                                            .await;
                                             return;
                                         }
                                     };
 
                                     if !is_receiver {
-                                        println!("You can't accept your self friend request");
-                                        let error_msg = WebSocketMessage {
-                                            action: "error".to_string(),
-                                            payload: serde_json::json!({"message": "You can't accept your self friend request"}),
-                                        };
-                                        if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                            let _ = message_session.text(error_json).await;
-                                        }
+                                        ws_error_message(
+                                            &mut message_session,
+                                            "You can accept your own friend request",
+                                        )
+                                        .await;
                                         return;
                                     }
 
@@ -370,7 +322,6 @@ pub async fn ws_handler(
                                         .await
                                         {
                                             Ok(friend) => {
-                                                println!("Friend request accepted: {:?}", friend);
                                                 let status = FriendRequestStatus {
                                                     id: friend.id.unwrap(),
                                                     sender_username: sender,
@@ -379,21 +330,18 @@ pub async fn ws_handler(
                                                 };
                                                 let _ = tx.send(FriendAction::Accept(status));
                                             }
-                                            Err(_) => {
-                                                eprintln!("Error accepting friend request");
-                                                let error_msg = WebSocketMessage {
-                                                    action: "error".to_string(),
-                                                    payload: serde_json::json!({"message": "Failed to accept friend request"}),
-                                                };
-                                                if let Ok(error_json) = serde_json::to_string(&error_msg) {
-                                                    let _ = message_session.text(error_json).await;
-                                                }
+                                            Err(e) => {
+                                                eprintln!("Error accepting friend request: {}", e);
+                                                ws_error_message(&mut message_session, "Error accepting friend request").await;
                                             }
                                         }
                                 }
                             }
 
-                            _ => eprintln!("Unknown action: {}", ws_msg.action),
+                            _ => {
+                                eprintln!("Unknown action: {}", ws_msg.action);
+                                ws_error_message(&mut message_session, "Unknown action").await;
+                            }
                         }
                     } else {
                         eprintln!("Failed to parse WebSocket message: {}", text);
@@ -531,5 +479,15 @@ pub async fn get_friend_req(
             println!("{:?}", e);
             return Ok(HttpResponse::InternalServerError().json("Failed to fetch friend request"));
         }
+    }
+}
+
+async fn ws_error_message(message_session: &mut Session, message: &str) {
+    let error_msg = WebSocketMessage {
+        action: "error".to_string(),
+        payload: serde_json::json!({"message": &message}),
+    };
+    if let Ok(error_json) = serde_json::to_string(&error_msg) {
+        let _ = message_session.text(error_json).await;
     }
 }

@@ -1,111 +1,125 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kutter - Chat</title>
+    <link rel="icon" href="imgs/kutter.png" />
+    <link rel="stylesheet" href="styles/build.css" />
+    <link
+      href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kutter - Chat</title>
-  <link rel="icon" href="imgs/kutter.png" />
-  <link rel="stylesheet" href="styles/build.css" />
-  <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet" />
-</head>
-
-<body>
-  <div class="opacity" id="modalBase">
-    <div class="userDetails" id="userDetails"></div>
-    <div class="userConfigModal" id="userConfigModal">
-      <div class="modalUserInfo">
-        <div class="photoConfigs" id="photoConfig">
-          <input name="photo-upload" type="file" id="photo-upload" accept="image/*" />
-          <div class="buttons">
-            <button class="label">
-              <label for="photo-upload">Select Photo</label>
-            </button>
-            <button id="upload-button" class="upload-button">
-              Upload
-            </button>
+  <body>
+    <div class="opacity" id="modalBase">
+      <div class="userDetails" id="userDetails"></div>
+      <div class="userConfigModal" id="userConfigModal">
+        <div class="modalUserInfo">
+          <div class="photoConfigs" id="photoConfig">
+            <input
+              name="photo-upload"
+              type="file"
+              id="photo-upload"
+              accept="image/*"
+            />
+            <div class="buttons">
+              <button class="label">
+                <label for="photo-upload">Select Photo</label>
+              </button>
+              <button id="upload-button" class="upload-button">Upload</button>
+            </div>
           </div>
+          <div class="personalInfo" id="personalInfo"></div>
         </div>
-        <div class="personalInfo" id="personalInfo"></div>
+        <button id="userConfigModalLogoutButton" class="logout-button">
+          <i class="bxr bx-arrow-in-right-square-half"></i>
+        </button>
+        <button id="userConfigModalCloseButton" class="close-button">
+          <i class="bx bx-x"></i>
+        </button>
+        <p class="version" id="version">Kutter version: 0.3.1</p>
       </div>
-      <button id="userConfigModalLogoutButton" class="logout-button">
-        <i class="bxr bx-arrow-in-right-square-half"></i>
-      </button>
-      <button id="userConfigModalCloseButton" class="close-button">
-        <i class="bx bx-x"></i>
-      </button>
-      <p class="version" id="version">Kutter version: 0.3.0</p>
     </div>
-  </div>
-  <div class="center_wrapper">
-    <!-- all chat like input and others will be rendered here -->
-    <div class="topbar" id="topbar">
-      <div class="photo">
-        <img id="topbar_photo" />
+    <div class="center_wrapper">
+      <!-- all chat like input and others will be rendered here -->
+      <div class="topbar" id="topbar">
+        <div class="photo">
+          <img id="topbar_photo" />
+        </div>
+        <p id="topbar_username"></p>
       </div>
-      <p id="topbar_username"></p>
-    </div>
-    <div class="chat_container" id="chat_container">
-      <!-- messages will be rendered here -->
-    </div>
-    <div class="changed_message_container" id="changed_message_container">
-      <!-- replied message will be rendered here -->
-    </div>
-    <div id="input_container" class="input_container">
-      <div role="textbox" aria-multiline="true" spellcheck="true" aria-contenteditable="true" contenteditable="true"
-        id="send_message_input" class="textarea" data-placeholder="Type your message here..."></div>
-      <button class="send_button" type="submit" id="send_message_button">
-        <i class="bx bx-send-alt"></i>
-      </button>
-    </div>
-  </div>
-  <div class="left-sidebar-wrapper" id="left_side_wrapper">
-    <aside class="left-sidebar">
-      <div class="header">
-        <h2>Chats</h2>
-        <button id="theme-button" class="theme-button">
-          <i class="bxr bx-sun" id="theme-icon"></i>
+      <div class="chat_container" id="chat_container">
+        <!-- messages will be rendered here -->
+      </div>
+      <div class="changed_message_container" id="changed_message_container">
+        <!-- replied message will be rendered here -->
+      </div>
+      <div id="input_container" class="input_container">
+        <div
+          role="textbox"
+          aria-multiline="true"
+          spellcheck="true"
+          aria-contenteditable="true"
+          contenteditable="true"
+          id="send_message_input"
+          class="textarea"
+          data-placeholder="Type your message here..."
+        ></div>
+        <button class="send_button" type="submit" id="send_message_button">
+          <i class="bx bx-send-alt"></i>
         </button>
       </div>
-      <div id="chats_container" class="chats">
-        <!-- chats will be rendered here -->
-      </div>
-      <div id="userInfo" class="user-infos">
-        <button class="settingsButton" id="settingsButton">
-          <i class='bxr bx-cog'></i>
-        </button>
-      </div>
-    </aside>
-  </div>
-  <div class="right-sidebar-wrapper" id="right_side_wrapper">
-    <aside class="right-sidebar">
-      <div class="send-friend-req">
-        <div class="inputs">
-          <input id="friend_req_input" type="text" placeholder="Send friend request" />
+    </div>
+    <div class="left-sidebar-wrapper" id="left_side_wrapper">
+      <aside class="left-sidebar">
+        <div class="header">
+          <h2>Chats</h2>
+          <button id="theme-button" class="theme-button">
+            <i class="bxr bx-sun" id="theme-icon"></i>
+          </button>
         </div>
-        <button class="friend_req_button" id="friend_req_button">
-          Add
-        </button>
-      </div>
-      <div class="friends" id="friends">
-        <!-- an example(actually is more a design test lmao) -->
-        <div class="friend_requests_container">
-          <h3>Friend Requests:</h3>
-          <div class="friend_requests" id="friend_requests">
-            <!-- friend requests will be rendered here -->
+        <div id="chats_container" class="chats">
+          <!-- chats will be rendered here -->
+        </div>
+        <div id="userInfo" class="user-infos">
+          <button class="settingsButton" id="settingsButton">
+            <i class="bxr bx-cog"></i>
+          </button>
+        </div>
+      </aside>
+    </div>
+    <div class="right-sidebar-wrapper" id="right_side_wrapper">
+      <aside class="right-sidebar">
+        <div class="send-friend-req">
+          <div class="inputs">
+            <input
+              id="friend_req_input"
+              type="text"
+              placeholder="Send friend request"
+            />
+          </div>
+          <button class="friend_req_button" id="friend_req_button">Add</button>
+        </div>
+        <div class="friends" id="friends">
+          <!-- an example(actually is more a design test lmao) -->
+          <div class="friend_requests_container">
+            <h3>Friend Requests:</h3>
+            <div class="friend_requests" id="friend_requests">
+              <!-- friend requests will be rendered here -->
+            </div>
+          </div>
+          <div class="friends_container">
+            <h3>Friends:</h3>
+            <div class="friends_accepted" id="friends_accepted">
+              <!-- friends will be rendered here -->
+            </div>
           </div>
         </div>
-        <div class="friends_container">
-          <h3>Friends:</h3>
-          <div class="friends_accepted" id="friends_accepted">
-            <!-- friends will be rendered here -->
-          </div>
-        </div>
-      </div>
-    </aside>
-  </div>
-  <script type="module" src="js/index.js"></script>
-  <script type="module" src="js/chat.js"></script>
-</body>
-
+      </aside>
+    </div>
+    <script type="module" src="js/index.js"></script>
+    <script type="module" src="js/chat.js"></script>
+  </body>
 </html>

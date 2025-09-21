@@ -1,6 +1,6 @@
 use crate::middlewares::verify_token;
 use actix_web::{Error, HttpRequest, HttpResponse, get, web};
-use actix_ws::Message;
+use actix_ws::{Message, Session};
 use chrono::{DateTime, Utc};
 use futures_util::StreamExt as _;
 use serde::{Deserialize, Serialize};
@@ -203,6 +203,7 @@ pub async fn ws_handler(
         Ok(chats) => chats,
         Err(e) => {
             eprintln!("Error fetching user chats: {}", e);
+            HttpResponse::BadRequest().json("Error fetching user chats");
             vec![]
         }
     };
@@ -230,7 +231,7 @@ pub async fn ws_handler(
     }
 
     let mut broadcast_session = session.clone();
-    let mut _message_session = session;
+    let mut message_session = session;
 
     let broadcast_email = email.clone();
     let broadcast_username = username.clone();
@@ -266,12 +267,14 @@ pub async fn ws_handler(
                                                         Ok(id) => id,
                                                         Err(e) => {
                                                             eprintln!("Error creating chat: {}", e);
+                                                            ws_error_message(&mut message_session, "Error creating chat").await;
                                                             return;
                                                         }
                                                     }
                                             },
                                             Err(e) => {
                                                 eprintln!("Error checking/creating chat: {}", e);
+                                                ws_error_message(&mut message_session, "Error checking/creating chat").await;
                                                 return;
                                             }
                                         };
@@ -293,6 +296,8 @@ pub async fn ws_handler(
                                                             "Error selecting replied message chat id: {}",
                                                             e
                                                         );
+                                                        ws_error_message(&mut message_session, "Error selecting replied message chat id")
+                                                            .await;
                                                         continue;
                                                     }
                                                 };
@@ -314,6 +319,11 @@ pub async fn ws_handler(
                                                             "Error selecting replied message: {}",
                                                             e
                                                         );
+                                                        ws_error_message(
+                                                            &mut message_session,
+                                                            "Error selecting replied message",
+                                                        )
+                                                        .await;
                                                         return;
                                                     }
                                                 };
@@ -334,6 +344,11 @@ pub async fn ws_handler(
                                                             "Error selecting replied user: {}",
                                                             e
                                                         );
+                                                        ws_error_message(
+                                                            &mut message_session,
+                                                            "Error selecting replied user",
+                                                        )
+                                                        .await;
                                                         return;
                                                     }
                                                 };
@@ -366,19 +381,23 @@ pub async fn ws_handler(
                                                         {
                                                             Ok(_) => {},
                                                             Err(e) => {
-                                                                eprintln!("Error updating chat last update: {}", e);
+                                                                eprintln!("Error updating chat: {}", e);
+                                                                ws_error_message(&mut message_session, "Error updating chat").await;
                                                             }
                                                         }
                                                         let _ = tx.send(OutgoingMessage::NewMessage(message));
                                                     }
                                                     Err(e) => {
                                                         println!("error sending message: {}", e);
+                                                        ws_error_message(&mut message_session, "Error sending message").await;
                                                     }
                                                 }
                                             } else {
-                                                eprintln!(
-                                                    "you cannot reply message from other chat"
+                                                ws_error_message(
+                                                    &mut message_session,
+                                                    "You can not reply a message from other chat",
                                                 )
+                                                .await;
                                             }
                                         } else {
                                             match sqlx::query_as::<_, ChatMessage>(
@@ -407,13 +426,15 @@ pub async fn ws_handler(
                                                     {
                                                         Ok(_) => {},
                                                         Err(e) => {
-                                                            eprintln!("Error updating chat last update: {}", e);
+                                                            eprintln!("Error updating chat: {}", e);
+                                                            ws_error_message(&mut message_session, "Error updating chat").await;
                                                         }
                                                     }
                                                     let _ = tx.send(OutgoingMessage::NewMessage(message));
                                                 }
                                                 Err(e) => {
-                                                    println!("error sending message: {}", e)
+                                                    eprintln!("error sending message: {}", e);
+                                                    ws_error_message(&mut message_session, "Error sending message").await;
                                                 }
                                             }
                                         }
@@ -453,12 +474,14 @@ pub async fn ws_handler(
                                                             let _ = tx.send(OutgoingMessage::EditMessage(message));
                                                         }
                                                         Err(e) => {
-                                                            println!("error sending message: {}", e);
+                                                            eprintln!("error sending message: {}", e);
+                                                            ws_error_message(&mut message_session, "Error sending message").await;
                                                         }
                                                     }
                                                 }
                                                 Err(e) => {
-                                                    println!("error editing message: {}", e);
+                                                    eprintln!("error editing message: {}", e);
+                                                    ws_error_message(&mut message_session, "Error editing message").await;
                                                 }
                                             }
                                         },
@@ -495,12 +518,22 @@ pub async fn ws_handler(
                                                         );
                                                     }
                                                     Err(e) => {
-                                                        println!("error sending message: {}", e);
+                                                        eprintln!("error sending message: {}", e);
+                                                        ws_error_message(
+                                                            &mut message_session,
+                                                            "Error sending message",
+                                                        )
+                                                        .await;
                                                     }
                                                 }
                                             }
                                             Err(e) => {
-                                                println!("error updating biography: {}", e);
+                                                eprintln!("error updating biography: {}", e);
+                                                ws_error_message(
+                                                    &mut message_session,
+                                                    "Error updating biography",
+                                                )
+                                                .await;
                                             }
                                         }
                                     }
@@ -520,13 +553,17 @@ pub async fn ws_handler(
                                         .await {
                                             Ok(can_create_chat) => can_create_chat,
                                             Err(_) => {
-                                                println!("{} can't send message to this user", &username);
+                                                ws_error_message(&mut message_session, "You can't send message").await;
                                                 Some(false)
                                             }
                                         };
 
                                         if can_create_chat == Some(false) {
-                                            println!("{} can't create chat", &username);
+                                            ws_error_message(
+                                                &mut message_session,
+                                                "You can't create chat",
+                                            )
+                                            .await;
                                             return;
                                         }
 
@@ -540,7 +577,11 @@ pub async fn ws_handler(
                                         .await;
 
                                         if let Ok(Some(_id)) = existing_chat {
-                                            println!("chat already exists");
+                                            ws_error_message(
+                                                &mut message_session,
+                                                "Chat already exists",
+                                            )
+                                            .await;
                                             return;
                                         }
 
@@ -555,13 +596,18 @@ pub async fn ws_handler(
                                             Ok(chat) => {
                                                 if let Err(e) = state.update_user_chats(&username).await {
                                                     eprintln!("Failed to update user chats: {}", e);
+                                                    ws_error_message(&mut message_session, "Failed to update user chats").await;
                                                 }
                                                 if let Err(e) = state.update_user_chats(&second_user_name).await {
                                                     eprintln!("Failed to update partner chats: {}", e);
+                                                    ws_error_message(&mut message_session, "Failed to update partner chats").await;
                                                 }
                                                 let _ = tx.send(OutgoingMessage::NewChat(chat));
                                             },
-                                            Err(_) => println!("error creating chat")
+                                            Err(e) => {
+                                                eprintln!("error creating chat: {}", e);
+                                                ws_error_message(&mut message_session, "Error creating chat").await;
+                                            }
                                         }
                                     }
                                 }
@@ -578,11 +624,8 @@ pub async fn ws_handler(
                                     .await {
                                         Ok(Some(msg)) => {
                                             if msg.username != username {
-                                                let _error_response = serde_json::json!({
-                                                    "status": "error",
-                                                    "message": "You can only delete your own messages"
-                                                });
-                                                continue;
+                                                ws_error_message(&mut message_session, "You can only delete your own messages").await;
+                                                break;
                                             }
 
                                             match sqlx::query("DELETE FROM messages WHERE id = $1")
@@ -593,24 +636,28 @@ pub async fn ws_handler(
                                                     let _ = tx.send(OutgoingMessage::Delete { message_id: delete_req.id });
                                                 }
                                                 Err(e) => {
-                                                    eprintln!("Error deleting message: {:?}", e);
+                                                    eprintln!("Error deleting message: {}", e);
+                                                    ws_error_message(&mut message_session, "Error deleting message").await;
                                                 }
                                             }
                                         },
                                         Ok(None) => {
-                                            let _error_response = serde_json::json!({
-                                                "status": "error",
-                                                "message": "Message not found"
-                                            });
+                                            ws_error_message(&mut message_session, "Message not found").await;
                                         },
                                         Err(e) => {
                                             eprintln!("Error fetching message: {}", e);
+                                            ws_error_message(&mut message_session, "Error fetching message").await;
                                         }
                                     }
                                 }
                             }
-                            _ => eprintln!("Unknown action: {}", ws_msg.action),
+                            _ => {
+                                eprintln!("Unknown action: {}", ws_msg.action);
+                                ws_error_message(&mut message_session, "Unknown action").await;
+                            }
                         }
+                    } else {
+                        eprintln!("Failed to parse WebSocket message: {}", text);
                     }
                 }
                 Message::Close(_) => {
@@ -892,5 +939,15 @@ pub async fn get_user(
             eprintln!("error fetching user informations: {}", e);
             return Ok(HttpResponse::InternalServerError().json("error fetching user informations"));
         }
+    }
+}
+
+async fn ws_error_message(message_session: &mut Session, message: &str) {
+    let error_msg = WebSocketMessage {
+        action: "error".to_string(),
+        payload: serde_json::json!({"message": &message}),
+    };
+    if let Ok(error_json) = serde_json::to_string(&error_msg) {
+        let _ = message_session.text(error_json).await;
     }
 }
