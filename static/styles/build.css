@@ -1108,16 +1108,10 @@ nav .nav-buttons .theme-button:hover {
   border: none;
   cursor: pointer;
   background-color: transparent;
-  color: var(--text);
+  color: var(--error);
 }
 .right-sidebar-wrapper .right-sidebar .friends .friends_container .friends_accepted .friend .buttonsDiv .cancel:hover {
-  color: var(--accent);
-}
-.right-sidebar-wrapper .right-sidebar .friends .friends_container .friends_accepted .friend .buttonsDiv .waiting {
-  height: 100%;
-  border: none;
-  background-color: transparent;
-  color: var(--text);
+  background-color: var(--error-bg);
 }
 .right-sidebar-wrapper .right-sidebar .friends .friend_requests_container {
   max-height: 40%;
@@ -1146,22 +1140,22 @@ nav .nav-buttons .theme-button:hover {
 .right-sidebar-wrapper .right-sidebar .friends .friend_requests_container .friend_requests .friend_request .buttonsDiv .accept_button {
   height: 100%;
   border: none;
-  background-color: var(--accent);
-  color: var(--text);
+  background-color: transparent;
+  color: var(--success);
   cursor: pointer;
 }
 .right-sidebar-wrapper .right-sidebar .friends .friend_requests_container .friend_requests .friend_request .buttonsDiv .accept_button:hover {
-  background-color: var(--hover-accent);
+  background-color: var(--success-bg);
 }
 .right-sidebar-wrapper .right-sidebar .friends .friend_requests_container .friend_requests .friend_request .buttonsDiv .cancel {
   height: 100%;
   border: none;
   cursor: pointer;
   background-color: transparent;
-  color: var(--text);
+  color: var(--error);
 }
 .right-sidebar-wrapper .right-sidebar .friends .friend_requests_container .friend_requests .friend_request .buttonsDiv .cancel:hover {
-  color: var(--accent);
+  background-color: var(--error-bg);
 }
 .right-sidebar-wrapper .right-sidebar .friends .friend_requests_container .friend_requests .friend_request .buttonsDiv .waiting {
   height: 100%;
