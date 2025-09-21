@@ -1220,18 +1220,11 @@ nav {
                 border: none;
                 cursor: pointer;
                 background-color: transparent;
-                color: variables.$text;
+                color: variables.$error;
 
                 &:hover {
-                  color: variables.$accent;
+                  background-color: variables.$error-bg;
                 }
-              }
-
-              & .waiting {
-                height: 100%;
-                border: none;
-                background-color: transparent;
-                color: variables.$text;
               }
             }
           }
@@ -1266,12 +1259,12 @@ nav {
               & .accept_button {
                 height: 100%;
                 border: none;
-                background-color: variables.$accent;
-                color: variables.$text;
+                background-color: transparent;
+                color: variables.$success;
                 cursor: pointer;
 
                 &:hover {
-                  background-color: variables.$hover-accent;
+                  background-color: variables.$success-bg;
                 }
               }
 
@@ -1280,10 +1273,10 @@ nav {
                 border: none;
                 cursor: pointer;
                 background-color: transparent;
-                color: variables.$text;
+                color: variables.$error;
 
                 &:hover {
-                  color: variables.$accent;
+                  background-color: variables.$error-bg;
                 }
               }
 
